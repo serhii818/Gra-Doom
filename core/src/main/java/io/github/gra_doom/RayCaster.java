@@ -100,8 +100,16 @@ public class RayCaster extends Renderer implements Disposable {
             int drawEnd = lineHeight/2 + height/2;
 
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            if (side == 0) shapeRenderer.setColor(Color.RED);
-            else shapeRenderer.setColor(Color.ORANGE);
+
+            switch (map.arr[mapY][mapX]) {
+                case 1 -> shapeRenderer.setColor(Color.RED);
+                case 2 -> shapeRenderer.setColor(Color.BLUE);
+                case 3 -> shapeRenderer.setColor(Color.GREEN);
+                case 4 -> shapeRenderer.setColor(Color.YELLOW);
+                default -> shapeRenderer.setColor(Color.BLACK);
+            }
+            Color c = shapeRenderer.getColor();
+            if (side == 0) shapeRenderer.setColor(c.mul(0.8f, 0.8f, .8f, 1f));
             shapeRenderer.line(x, drawStart, x, drawEnd);
             shapeRenderer.end();
 
@@ -114,12 +122,6 @@ public class RayCaster extends Renderer implements Disposable {
     public void renderFrame(Map map) {
         frameBuffer.begin();
         clearScreen();
-
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.YELLOW);
-        shapeRenderer.rect(0, 0, frameBuffer.getWidth()*2, frameBuffer.getHeight());
-        shapeRenderer.end();
-
 
         rayCast(map);
         frameBuffer.end();
