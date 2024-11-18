@@ -29,7 +29,7 @@ abstract public class Renderer  implements Disposable {
         NONE,
     }
 
-    // Parameters for dposition and size of frame on the sceen
+    // Parameters for position and size of frame on the sceen
     int renderWidth;
     int renderHeight;
     int renderPosX;
@@ -112,6 +112,7 @@ abstract public class Renderer  implements Disposable {
                 break;
         }
     }
+
 
 
 }
