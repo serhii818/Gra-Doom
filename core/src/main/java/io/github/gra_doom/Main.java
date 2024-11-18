@@ -18,7 +18,7 @@ public class Main extends Game {
      */
     @Override
     public void create() {
-    setScreen(new MenuScreen());
+   this.setScreen(new MenuScreen());
     }
 
     /**
@@ -26,14 +26,25 @@ public class Main extends Game {
      */
     @Override
     public void render() {
-
+        super.render();
+    }
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
     }
 
-    /**
-     * clean up and destroying resourses
-     */
+    @Override
+    public void pause() {
+        super.pause();
+    }
+
+    @Override
+    public void resume() {
+        super.resume();
+    }
+
     @Override
     public void dispose() {
-
+        super.dispose();
     }
 }

@@ -1,87 +1,101 @@
 package io.github.gra_doom;
 
+
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.graphics.Color;
 
-public class MenuScreen implements Screen{private Stage stage;
-    private Skin skin;
+public class MenuScreen implements Screen {
+
+    private Stage stage;
+    private SpriteBatch batch;
+    private Texture backgroundTexture;
 
     @Override
     public void show() {
-        // Tworzenie sceny z widokiem ekranu
+        // Tworzenie sceny i batcha
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        // Ładowanie skórki - sprawdź, czy ścieżka do pliku JSON jest poprawna
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
+        batch = new SpriteBatch();
+        backgroundTexture = new Texture("doommenu.jpg");
 
-        // Tworzenie tabeli do układania elementów interfejsu
+        // Dodanie przycisków i listenerów
         Table table = new Table();
-        table.setFillParent(true);  // Wypełnia cały ekran
-        stage.addActor(table);
+        table.center();
+        table.setFillParent(true);
 
-        // Tworzenie przycisków
-        TextButton startButton = new TextButton("Start Game", skin);
-        TextButton exitButton = new TextButton("Exit", skin);
+        TextButton startButton = new TextButton("Rozpocznij Gre", new TextButton.TextButtonStyle());
+        TextButton exitButton = new TextButton("Wyjdź z Gry", new TextButton.TextButtonStyle());
 
-        // Dodanie przycisków do tabeli z wypełnieniem
-        table.add(startButton).fillX().uniformX();
-        table.row().pad(10, 0, 10, 0);  // Odstęp między przyciskami
+        startButton.getStyle().fontColor = Color.WHITE;
+        exitButton.getStyle().fontColor = Color.WHITE;
+
+        // Dodanie listenerów
+        startButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                // Zmieniamy ekran na GameScreen
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new GameScreen());
+            }
+        });
+
+        exitButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.app.exit(); // Zamyka aplikację
+            }
+        });
+
+        // Dodanie przycisków do tabeli
+        table.add(startButton).fillX().uniformX().padBottom(20);
+        table.row().pad(10, 0, 10, 0);
         table.add(exitButton).fillX().uniformX();
 
-        // Dodanie nasłuchiwaczy do przycisków
-        startButton.addListener(event -> {
-            if (startButton.isPressed()) {
-                // Tutaj można przełączyć się na ekran gry
-                // Przykład: yourGame.setScreen(new GameScreen());
-                System.out.println("Start Game clicked!");
-            }
-            return true;
-        });
-
-        exitButton.addListener(event -> {
-            if (exitButton.isPressed()) {
-                Gdx.app.exit();  // Zamknięcie aplikacji
-            }
-            return true;
-        });
+        // Dodanie tabeli do sceny
+        stage.addActor(table);
     }
 
     @Override
     public void render(float delta) {
-        // Czyszczenie ekranu
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.begin();
+        batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.end();
 
-        // Aktualizacja i rysowanie sceny
-        stage.act(Math.min(delta, 1 / 30f));
+        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        // Aktualizacja widoku
         stage.getViewport().update(width, height, true);
     }
+
+    @Override
+    public void hide() {
+        stage.dispose();
+        batch.dispose();
+        backgroundTexture.dispose();
+    }
+
+
+    @Override
+    public void dispose() {}
 
     @Override
     public void pause() {}
 
     @Override
     public void resume() {}
-
-    @Override
-    public void hide() {}
-
-    @Override
-    public void dispose() {
-        // Zwalnianie zasobów
-        stage.dispose();
-        skin.dispose();
-    }
 }
