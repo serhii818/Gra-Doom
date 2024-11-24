@@ -97,9 +97,9 @@ public class RayCaster extends Renderer implements Disposable {
                 int color;
 
                 // floor
-                // TODO get floor texture
                 color = floorTex.getPixel(tx, ty);
                 color = (color >> 1) & 8355711; // make a bit darker
+                color = color | 0b00000000_00000000_00000000_11111111;
                 buffer.drawPixel(x, y, color);
 
                 //ceiling (symmetrical, at screenHeight - y - 1 instead of y)
@@ -160,8 +160,9 @@ public class RayCaster extends Renderer implements Disposable {
             }
 
             // trawell alond ray direction until wall hit
-            // FIXME if the is no wall allond thw way it will go outside of map range and will crash the game
-            while (hit == 0) {
+            int c = 0;
+            while (hit == 0 && c < 100) {
+                c++;
                 if (sideDistX < sideDistY) {
                     sideDistX += deltaDistX;
                     mapX += stepX;
@@ -172,46 +173,48 @@ public class RayCaster extends Renderer implements Disposable {
                     side = 1;
                 }
 
-                if (map.arr[mapY][mapX] > 0) hit = 1;
+                if (map.arr.length > mapY && mapY >= 0 && map.arr[0].length > mapX && mapX >= 0) {
+                    if (map.arr[mapY][mapX] > 0) hit = 1;
+                } else {
+                    break;
+                }
             }
 
-            if (side == 0)  perpWallDist = (sideDistX - deltaDistX);
-            else            perpWallDist = (sideDistY - deltaDistY);
+            if (hit == 1) {
+                if (side == 0) perpWallDist = (sideDistX - deltaDistX);
+                else perpWallDist = (sideDistY - deltaDistY);
 
-            lineHeight = (int)(height/perpWallDist);
+                lineHeight = (int) (height / perpWallDist);
 
-            int drawStart = -lineHeight/2 + height/2;
-            int drawEnd = lineHeight/2 + height/2;
+                int drawStart = -lineHeight / 2 + height / 2;
+                int drawEnd = lineHeight / 2 + height / 2;
 
-            int texNum = map.arr[mapY][mapX] -1;
-            float wallX;
-            if (side == 0) wallX = cam.pos.y + perpWallDist*rayDirY;
-            else wallX = cam.pos.x + perpWallDist*rayDirX;
-            wallX -= (float) Math.floor(wallX);
+                int texNum = map.arr[mapY][mapX] - 1;
+                float wallX;
+                if (side == 0) wallX = cam.pos.y + perpWallDist * rayDirY;
+                else wallX = cam.pos.x + perpWallDist * rayDirX;
+                wallX -= (float) Math.floor(wallX);
 
-            int texX = (int)(wallX * texW);
-            if(side == 0 && rayDirX > 0) texX = texW - texX - 1;
-            if(side == 1 && rayDirY < 0) texX = texW - texX - 1;
+                int texX = (int) (wallX * texW);
+                if (side == 0 && rayDirX > 0) texX = texW - texX - 1;
+                if (side == 1 && rayDirY < 0) texX = texW - texX - 1;
 
-            float step = (1.0f * texH) / lineHeight;
-            float texPos = (drawStart - height / 2.0f + lineHeight / 2.0f) * step;
+                float step = (1.0f * texH) / lineHeight;
+                float texPos = (drawStart - height / 2.0f + lineHeight / 2.0f) * step;
 
 
-            for (int y = drawStart; y < drawEnd; y++) {
-                int texY = (int)texPos & (texH - 1);
-                texPos += step;
+                for (int y = drawStart; y < drawEnd; y++) {
+                    int texY = (int) texPos & (texH - 1);
+                    texPos += step;
 
-                int color = textures[texNum].getPixel(texX, texY);
-                if(side == 1) color = (color >> 1) & 8355711;
-                buffer.drawPixel(x, y, color);
+                    int color = textures[texNum].getPixel(texX, texY);
+                    if (side == 1) color = (color >> 1) & 8355711;
+                    color = color | 0b00000000_00000000_00000000_11111111;
+                    buffer.drawPixel(x, y, color);
 
+                }
             }
-
-            // TODO draw floor
-
-
         }
-
     }
 
     @Override
