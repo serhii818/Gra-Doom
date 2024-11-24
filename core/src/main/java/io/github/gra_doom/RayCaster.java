@@ -1,5 +1,6 @@
 package io.github.gra_doom;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -20,6 +21,8 @@ public class RayCaster extends Renderer implements Disposable {
     int texW;
     int texH;
     Pixmap buffer;
+    Pixmap floorTex;
+    Pixmap ceilingTex;
 
     public RayCaster(int width, int height, Texture[] textures_) {
         this.width = width;
@@ -33,9 +36,15 @@ public class RayCaster extends Renderer implements Disposable {
         this.texW = textures_[0].getWidth();
         this.texH = textures_[0].getHeight();
 
+        this.floorTex = this.textures[3];
+        this.ceilingTex = this.textures[6];
+
+
+
         winCamera = new OrthographicCamera(width, height);
         winCamera.position.set(width/2f, height/2f, 0);
         winCamera.update();
+
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setProjectionMatrix(winCamera.combined);
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
@@ -51,9 +60,56 @@ public class RayCaster extends Renderer implements Disposable {
 
 
         // rotation for testing, delete this for proper movement testing
-        //map.cam.dir.rotateDeg(0.5f);
-        //map.cam.plane.rotateDeg(0.5f);
+        map.cam.dir.rotateDeg(2f);
+        map.cam.plane.rotateDeg(2f);
 
+        // floor casting
+        for (int y = 0; y < height; y++) {
+            float rayDirX0 = cam.dir.x - cam.plane.x;
+            float rayDirY0 = cam.dir.y - cam.plane.y;
+            float rayDirX1 = cam.dir.x + cam.plane.x;
+            float rayDirY1 = cam.dir.y + cam.plane.y;
+
+            int p = y - height / 2;
+            float posZ = 0.5f * height;
+            float rowDistance = posZ / p;
+
+            float floorStepX = rowDistance * (rayDirX1 - rayDirX0) / width;
+            float floorStepY = rowDistance * (rayDirY1 - rayDirY0) / width;
+
+            float floorX = cam.pos.x + rowDistance * rayDirX0;
+            float floorY = cam.pos.y + rowDistance * rayDirY0;
+
+            for(int x = 0; x < width; ++x)
+            {
+                // the cell coord is simply got from the integer parts of floorX and floorY
+                int cellX = (int)(floorX);
+                int cellY = (int)(floorY);
+
+                // get the texture coordinate from the fractional part
+                int tx = (int)(texW * (floorX - cellX)) & (texW - 1);
+                int ty = (int)(texH * (floorY - cellY)) & (texH - 1);
+
+                floorX += floorStepX;
+                floorY += floorStepY;
+
+                // choose texture and draw the pixel
+                int color;
+
+                // floor
+                // TODO get floor texture
+                color = floorTex.getPixel(tx, ty);
+                color = (color >> 1) & 8355711; // make a bit darker
+                buffer.drawPixel(x, y, color);
+
+                //ceiling (symmetrical, at screenHeight - y - 1 instead of y)
+                color = ceilingTex.getPixel(tx, ty);
+                color = (color >> 1) & 8355711; // make a bit darker
+                buffer.drawPixel(x, height-y-1, color);
+            }
+        }
+
+        // wall casting
         for (int x = 0; x < width; x++) {
             float cameraX = 2*x / (float)width -1;              // direction of ray relative to the center of screen (-1; 1)
             float rayDirX = cam.dir.x + cam.plane.x* cameraX;
@@ -127,7 +183,6 @@ public class RayCaster extends Renderer implements Disposable {
             int drawStart = -lineHeight/2 + height/2;
             int drawEnd = lineHeight/2 + height/2;
 
-            // TODO draw textures
             int texNum = map.arr[mapY][mapX] -1;
             float wallX;
             if (side == 0) wallX = cam.pos.y + perpWallDist*rayDirY;
@@ -141,6 +196,7 @@ public class RayCaster extends Renderer implements Disposable {
             float step = (1.0f * texH) / lineHeight;
             float texPos = (drawStart - height / 2.0f + lineHeight / 2.0f) * step;
 
+
             for (int y = drawStart; y < drawEnd; y++) {
                 int texY = (int)texPos & (texH - 1);
                 texPos += step;
@@ -150,6 +206,8 @@ public class RayCaster extends Renderer implements Disposable {
                 buffer.drawPixel(x, y, color);
 
             }
+
+            // TODO draw floor
 
 
         }
@@ -188,8 +246,16 @@ public class RayCaster extends Renderer implements Disposable {
         }
     }
 
+
     @Override
     public void dispose() {
-        // TODO dispose of all objects this class
+        frameBuffer.dispose();
+        frame.dispose();
+        batch.dispose();
+        shapeRenderer.dispose();
+        buffer.dispose();
+        for (Pixmap texture : textures) {
+            texture.dispose();
+        }
     }
 }

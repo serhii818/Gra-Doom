@@ -40,7 +40,7 @@ public class Main extends ApplicationAdapter {
 
         }
 
-        Gdx.graphics.setWindowedMode(1600, 800);
+        Gdx.graphics.setWindowedMode(1800, 1000);
         dr = new DebugRenderer(20, 800, 400);
         rc = new RayCaster(800, 600, textures);
         dr.setMode(Renderer.DrawMode.CORNER_UL);
@@ -89,8 +89,6 @@ public class Main extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
-        rc.setMode(rc.drawMode);
-        dr.setMode(dr.drawMode);
     }
 
     /**
