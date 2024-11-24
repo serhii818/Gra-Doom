@@ -1,15 +1,14 @@
 package io.github.gra_doom;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
  * Class for rendering scene on the screen allowing positioning the contents in 5 places
@@ -46,10 +45,34 @@ abstract public class Renderer  implements Disposable {
     SpriteBatch batch;
     ShapeRenderer shapeRenderer;
     OrthographicCamera winCamera;
+    Viewport viewport;
+
+    public Renderer(int width, int height) {
+        this.height = height;
+        this.width = width;
+
+        winCamera = new OrthographicCamera();
+        viewport = new FitViewport(width, height, winCamera);
+        winCamera.position.set(width/2f, height/2f, 0);
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        winCamera.update();
+
+        shapeRenderer = new ShapeRenderer();
+        shapeRenderer.setProjectionMatrix(winCamera.combined);
+        frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
+        batch = new SpriteBatch();
+
+        setMode(DrawMode.FULL_WINDOW);
+    }
 
     abstract public void render(Map map);
     abstract public void renderFrame(Map map);
-    abstract public void dispose();
+    public void dispose() {
+        frameBuffer.dispose();
+        frame.dispose();
+        batch.dispose();
+        shapeRenderer.dispose();
+    }
 
     /**
      * Draws contents of frame on the screen according to DrawMode
@@ -112,7 +135,5 @@ abstract public class Renderer  implements Disposable {
                 break;
         }
     }
-
-
 
 }

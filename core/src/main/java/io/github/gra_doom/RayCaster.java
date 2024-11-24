@@ -1,6 +1,5 @@
 package io.github.gra_doom;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -20,13 +19,17 @@ public class RayCaster extends Renderer implements Disposable {
 
     int texW;
     int texH;
+
     Pixmap buffer;
     Pixmap floorTex;
     Pixmap ceilingTex;
 
+    private boolean drawFloorEnabled;
+
     public RayCaster(int width, int height, Texture[] textures_) {
-        this.width = width;
-        this.height = height;
+        super(width, height);
+
+        // convert texture into PixMaps and setup buffer
         this.textures = new Pixmap[textures_.length];
         for (int i = 0; i < this.textures.length; i++) {
             TextureData t = textures_[i].getTextureData();
@@ -36,24 +39,15 @@ public class RayCaster extends Renderer implements Disposable {
         this.texW = textures_[0].getWidth();
         this.texH = textures_[0].getHeight();
 
-        this.floorTex = this.textures[3];
-        this.ceilingTex = this.textures[6];
+        this.floorTex = this.textures[2];
+        this.ceilingTex = this.textures[7];
 
-
-
-        winCamera = new OrthographicCamera(width, height);
-        winCamera.position.set(width/2f, height/2f, 0);
-        winCamera.update();
-
-        shapeRenderer = new ShapeRenderer();
-        shapeRenderer.setProjectionMatrix(winCamera.combined);
-        frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
         buffer = new Pixmap(width, height, Pixmap.Format.RGBA8888);
-        batch = new SpriteBatch();
-        setMode(DrawMode.FULL_WINDOW);
+
+        setDrawFloorEnabled(true);
     }
 
-    private void  rayCast(Map map) {
+    private void rayCast(Map map) {
         GameCamera cam = map.cam;
         buffer.setColor(Color.BLACK);
         buffer.fill();
@@ -64,6 +58,13 @@ public class RayCaster extends Renderer implements Disposable {
         map.cam.plane.rotateDeg(2f);
 
         // floor casting
+        if (drawFloorEnabled) drawFloor(cam);
+
+        // wall casting
+        drawWalls(cam, map);
+    }
+
+    private void drawFloor(GameCamera cam) {
         for (int y = 0; y < height; y++) {
             float rayDirX0 = cam.dir.x - cam.plane.x;
             float rayDirY0 = cam.dir.y - cam.plane.y;
@@ -82,7 +83,7 @@ public class RayCaster extends Renderer implements Disposable {
 
             for(int x = 0; x < width; ++x)
             {
-                // the cell coord is simply got from the integer parts of floorX and floorY
+                // the cell coordinate is simply got from the integer parts of floorX and floorY
                 int cellX = (int)(floorX);
                 int cellY = (int)(floorY);
 
@@ -98,35 +99,41 @@ public class RayCaster extends Renderer implements Disposable {
 
                 // floor
                 color = floorTex.getPixel(tx, ty);
-                color = (color >> 1) & 8355711; // make a bit darker
-                color = color | 0b00000000_00000000_00000000_11111111;
+                //color = (color >> 1) & 8355711; // make a bit darker
+                //color = color | 0b00000000_00000000_00000000_11111111;
                 buffer.drawPixel(x, y, color);
 
                 //ceiling (symmetrical, at screenHeight - y - 1 instead of y)
                 color = ceilingTex.getPixel(tx, ty);
-                color = (color >> 1) & 8355711; // make a bit darker
+                //color = (color >> 1) & 8355711; // make a bit darker
+                color = color & 0xef_ef_ef_ff;
                 buffer.drawPixel(x, height-y-1, color);
             }
         }
+    }
 
-        // wall casting
+    public void setDrawFloorEnabled(boolean drawFloorEnabled) {
+        this.drawFloorEnabled = drawFloorEnabled;
+    }
+
+    private void drawWalls(GameCamera cam, Map map) {
         for (int x = 0; x < width; x++) {
             float cameraX = 2*x / (float)width -1;              // direction of ray relative to the center of screen (-1; 1)
             float rayDirX = cam.dir.x + cam.plane.x* cameraX;
             float rayDirY = cam.dir.y + cam.plane.y* cameraX;
 
-            float deltaDistX = (rayDirX == 0) ? 1e30f : Math.abs(1/ rayDirX); // distance to travell along y for next integer x value
+            float deltaDistX = (rayDirX == 0) ? 1e30f : Math.abs(1/ rayDirX); // distance to travel along y for next integer x value
             float deltaDistY = (rayDirY == 0) ? 1e30f : Math.abs(1/ rayDirY);
 
-            // curent map position
+            // current map position
             int mapX = (int)(cam.pos.x);
             int mapY = (int)(cam.pos.y);
 
-            // accumulative distance travelled allond x and y
+            // accumulative distance travelled along x and y
             float sideDistX;
             float sideDistY;
 
-            // distance to the wall perpendicular to he camera plane
+            // distance to the wall perpendicular to the camera plane
             float perpWallDist;
             int lineHeight;
 
@@ -219,11 +226,9 @@ public class RayCaster extends Renderer implements Disposable {
 
     @Override
     public void renderFrame(Map map) {
-        frameBuffer.begin();
-        //clearScreen();
-
+        //frameBuffer.begin();
         rayCast(map);
-        frameBuffer.end();
+        //frameBuffer.end();
     }
 
     @Override
@@ -237,9 +242,9 @@ public class RayCaster extends Renderer implements Disposable {
         if (drawMode!=DrawMode.NONE) {
             frame = new Texture(buffer);
             TextureRegion frameT = new TextureRegion(frame);
-
+            System.out.println(frameT.getTexture().getWidth());
             batch.begin();
-            frameT.flip(false, true);
+            //frameT.flip(false, true);
             batch.draw(
                 frameT,
                 renderPosX, renderPosY,
@@ -249,13 +254,9 @@ public class RayCaster extends Renderer implements Disposable {
         }
     }
 
-
     @Override
     public void dispose() {
-        frameBuffer.dispose();
-        frame.dispose();
-        batch.dispose();
-        shapeRenderer.dispose();
+        super.dispose();
         buffer.dispose();
         for (Pixmap texture : textures) {
             texture.dispose();
