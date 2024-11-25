@@ -54,8 +54,6 @@ public class RayCaster extends Renderer implements Disposable {
 
 
         // rotation for testing, delete this for proper movement testing
-        map.cam.dir.rotateDeg(2f);
-        map.cam.plane.rotateDeg(2f);
 
         // floor casting
         if (drawFloorEnabled) drawFloor(cam);
