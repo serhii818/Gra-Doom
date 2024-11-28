@@ -93,6 +93,8 @@ public class Main extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
+        rc.viewport.update(width, height, true);
+        //dr.viewport.update(width, height, true);
     }
 
     /**

@@ -1,29 +1,21 @@
 package io.github.gra_doom;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ * Debug renderer for viewing actual 2d scene from top-down view
+ */
 public class DebugRenderer extends Renderer {
     int cellSize;
-    //size of frame buffer
-
 
     public DebugRenderer(int cellSize, int width, int height) {
+        super(width, height);
         this.cellSize = cellSize;
-        this.width = width;
-        this.height = height;
-
-        winCamera = new OrthographicCamera(width, height);
-        winCamera.position.set(width/2f, height/2f, 0);
-        winCamera.update();
-        shapeRenderer = new ShapeRenderer();
-        shapeRenderer.setProjectionMatrix(winCamera.combined);
-        frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
-        batch = new SpriteBatch();
-        setMode(DrawMode.FULL_WINDOW);
     }
 
     private void drawMap(Map map) {
@@ -50,7 +42,9 @@ public class DebugRenderer extends Renderer {
         shapeRenderer.end();
     }
 
-
+    /**
+     * Render frame in frameBuffer before rendering it on screen
+     */
     @Override
     public void renderFrame(Map map) {
         frameBuffer.begin();
@@ -76,9 +70,6 @@ public class DebugRenderer extends Renderer {
 
     @Override
     public void dispose() {
-        shapeRenderer.dispose();
-        frameBuffer.dispose();
-        frame.dispose();
-        batch.dispose();
+        super.dispose();
     }
 }
