@@ -17,6 +17,9 @@ public class Main extends ApplicationAdapter {
     Renderer rc;
     // -----------------
 
+    GameCamera cam;
+    KeyboardController keyboardController;
+    	
     /**
      * Initialization method
      */
@@ -46,9 +49,10 @@ public class Main extends ApplicationAdapter {
         dr.setMode(Renderer.DrawMode.CORNER_UL);
         rc.setMode(Renderer.DrawMode.FULL_WINDOW);
 
-        GameCamera cam = new GameCamera(new Vector2(14.4f, 10.8f), new Vector2(-1, 0), new Vector2(0, 0.66f));
-        cam.dir.rotateDeg(-90);
-        cam.plane.rotateDeg(-90);
+        cam = new GameCamera(new Vector2(14.4f, 10.8f), new Vector2(-1, 0), new Vector2(0, 0.66f));
+        keyboardController = new KeyboardController(cam);
+        
+        Gdx.input.setInputProcessor(keyboardController);
 
         int[][] arr = {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -59,7 +63,7 @@ public class Main extends ApplicationAdapter {
             {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
             {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,4,0,3,0,3,0,0,0,1},
+            {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -102,6 +106,9 @@ public class Main extends ApplicationAdapter {
         // render
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        
+        
+        cam.update();
 
         rc.render(selectedMap);
         //dr.render(selectedMap);
