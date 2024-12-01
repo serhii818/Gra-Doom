@@ -19,7 +19,7 @@ public class Main extends ApplicationAdapter {
 
     GameCamera cam;
     KeyboardController keyboardController;
-    	
+
     /**
      * Initialization method
      */
@@ -47,11 +47,12 @@ public class Main extends ApplicationAdapter {
         dr = new DebugRenderer(20, 800, 400);
         rc = new RayCaster(800, 600, textures);
         dr.setMode(Renderer.DrawMode.CORNER_UL);
-        rc.setMode(Renderer.DrawMode.FULL_WINDOW);
+        rc.setMode(Renderer.DrawMode.CORNER_UR);
+        ((RayCaster)rc).setDrawFloorEnabled(false);
 
         cam = new GameCamera(new Vector2(14.4f, 10.8f), new Vector2(-1, 0), new Vector2(0, 0.66f));
         keyboardController = new KeyboardController(cam);
-        
+
         Gdx.input.setInputProcessor(keyboardController);
 
         int[][] arr = {
@@ -94,7 +95,7 @@ public class Main extends ApplicationAdapter {
     public void resize(int width, int height) {
         super.resize(width, height);
         rc.viewport.update(width, height, true);
-        //dr.viewport.update(width, height, true);
+        dr.viewport.update(width, height, true);
     }
 
     /**
@@ -108,12 +109,12 @@ public class Main extends ApplicationAdapter {
         // render
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        
-        
+
+
         cam.update();
 
         rc.render(selectedMap);
-        //dr.render(selectedMap);
+        dr.render(selectedMap);
     }
 
     /**

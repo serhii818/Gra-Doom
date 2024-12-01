@@ -8,10 +8,8 @@ import io.github.gra_doom.GameCamera;
 import io.github.gra_doom.Map;
 
 abstract public class Entity implements Drawable{
-    float posx;
-    float posy;
-    float w;
-    float h;
+    Vector2 pos;
+    Vector2 size;
     Pixmap sprite;
 
     public Entity(float posx, float posy, float w, float y, Pixmap sprite) {
