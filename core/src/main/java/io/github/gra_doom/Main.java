@@ -44,7 +44,7 @@ public class Main extends ApplicationAdapter {
         dr = new DebugRenderer(20, 800, 400);
         rc = new RayCaster(800, 600, textures);
         dr.setMode(Renderer.DrawMode.CORNER_UL);
-        rc.setMode(Renderer.DrawMode.CORNER_UR);
+        rc.setMode(Renderer.DrawMode.FULL_WINDOW);
         ((RayCaster)rc).setDrawFloorEnabled(false);
 
         cam = Player.makePlayer();
@@ -111,7 +111,7 @@ public class Main extends ApplicationAdapter {
         selectedMap.update();
 
         rc.render(selectedMap);
-        dr.render(selectedMap);
+        //dr.render(selectedMap);
     }
 
     /**
