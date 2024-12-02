@@ -2,12 +2,9 @@ package io.github.gra_doom;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-
-import java.io.File;
 
 public class Main extends ApplicationAdapter {
     Map selectedMap;
@@ -17,7 +14,7 @@ public class Main extends ApplicationAdapter {
     Renderer rc;
     // -----------------
 
-    GameCamera cam;
+    Player cam;
     KeyboardController keyboardController;
 
     /**
@@ -43,14 +40,14 @@ public class Main extends ApplicationAdapter {
 
         }
 
-        Gdx.graphics.setWindowedMode(1800, 1000);
+        Gdx.graphics.setWindowedMode(1600, 800);
         dr = new DebugRenderer(20, 800, 400);
         rc = new RayCaster(800, 600, textures);
         dr.setMode(Renderer.DrawMode.CORNER_UL);
         rc.setMode(Renderer.DrawMode.CORNER_UR);
         ((RayCaster)rc).setDrawFloorEnabled(false);
 
-        cam = new GameCamera(new Vector2(14.4f, 10.8f), new Vector2(-1, 0), new Vector2(0, 0.66f));
+        cam = Player.makePlayer();
         keyboardController = new KeyboardController(cam);
 
         Gdx.input.setInputProcessor(keyboardController);
@@ -111,7 +108,7 @@ public class Main extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 
-        cam.update();
+        selectedMap.update();
 
         rc.render(selectedMap);
         dr.render(selectedMap);

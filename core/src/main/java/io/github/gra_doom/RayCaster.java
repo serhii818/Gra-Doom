@@ -1,14 +1,10 @@
 package io.github.gra_doom;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 
 /**
@@ -48,7 +44,7 @@ public class RayCaster extends Renderer implements Disposable {
     }
 
     private void rayCast(Map map) {
-        GameCamera cam = map.cam;
+        Player cam = map.player;
         buffer.setColor(Color.BLACK);
         buffer.fill();
 
@@ -62,7 +58,7 @@ public class RayCaster extends Renderer implements Disposable {
         drawWalls(cam, map);
     }
 
-    private void drawFloor(GameCamera cam) {
+    private void drawFloor(Player cam) {
         for (int y = 0; y < height; y++) {
             float rayDirX0 = cam.dir.x - cam.plane.x;
             float rayDirY0 = cam.dir.y - cam.plane.y;
@@ -114,7 +110,7 @@ public class RayCaster extends Renderer implements Disposable {
         this.drawFloorEnabled = drawFloorEnabled;
     }
 
-    private void drawWalls(GameCamera cam, Map map) {
+    private void drawWalls(Player cam, Map map) {
         for (int x = 0; x < width; x++) {
             float cameraX = 2*x / (float)width -1;              // direction of ray relative to the center of screen (-1; 1)
             float rayDirX = cam.dir.x + cam.plane.x* cameraX;

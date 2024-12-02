@@ -4,14 +4,14 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 
 public class KeyboardController implements InputProcessor{
-	
-	private GameCamera cam;
-	
 
-	public KeyboardController(GameCamera cam) {
+	private Player cam;
+
+
+	public KeyboardController(Player cam) {
 		this.cam = cam;
 	}
-	
+
 	@Override
 	public boolean keyDown(int keycode) {
 		switch(keycode) {
@@ -36,7 +36,7 @@ public class KeyboardController implements InputProcessor{
 		}
 		return true;
 	}
-	
+
     @Override
     public boolean keyUp(int keycode) {
         switch (keycode) {
@@ -61,7 +61,7 @@ public class KeyboardController implements InputProcessor{
         }
         return true;
     }
-	
+
     @Override
     public boolean keyTyped(char character) {
     	return false;
@@ -76,22 +76,22 @@ public class KeyboardController implements InputProcessor{
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         return false;
     }
-    
+
     @Override
     public boolean scrolled(float amountX, float amountY) {
         return false;
     }
-    
+
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         return false;
     }
-    
+
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         return false;
     }
-    
+
     @Override
     public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
         return false;

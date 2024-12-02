@@ -1,11 +1,38 @@
 package io.github.gra_doom;
 
-public class Map {
-    public int[][] arr;
-    GameCamera cam;
+import io.github.gra_doom.entity.Entity;
 
-    public Map(int[][] arr, GameCamera cam) {
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Map implements Serializable {
+    public int[][] arr;
+    Player player;
+    public ArrayList<Entity> entities;
+
+    public Map(int[][] arr, Player player) {
         this.arr = arr;
-        this.cam = cam;
+        this.player = player;
+
+        entities = new ArrayList<>();
+
+    }
+
+    public int getArr(int x, int y) {
+        return arr[x][y];
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void addEntity(Entity e) {
+        entities.add(e);
+    }
+
+    public void update() {
+        player.update(this);
+
+
     }
 }

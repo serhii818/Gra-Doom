@@ -4,48 +4,36 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.math.Vector2;
-import io.github.gra_doom.GameCamera;
+import io.github.gra_doom.Player;
 import io.github.gra_doom.Map;
 
-abstract public class Entity implements Drawable{
-    Vector2 pos;
-    Vector2 size;
-    Pixmap sprite;
+import java.io.Serializable;
 
-    public Entity(float posx, float posy, float w, float y, Pixmap sprite) {
-        this.posx = posx;
-        this.posy = posy;
-        this.w = w;
-        this.h = h;
+abstract public class Entity implements Drawable, Serializable {
+    public Vector2 pos;
+    public float size;
+    public Pixmap sprite;
+
+    public Entity( Vector2 pos,  float size, Pixmap sprite) {
+        this.pos = pos;
+        this.size = size;
         this.sprite = sprite;
     }
 
-    public Entity(float posx, float posy, float w, float y, Texture sprite) {
-        this.posx = posx;
-        this.posy = posy;
-        this.w = w;
-        this.h = h;
-
-        TextureData t = sprite.getTextureData();
-        t.prepare();
-        this.sprite = t.consumePixmap();
-
-
-    }
 
     public static boolean isColliding(Entity e1, Entity e2) {
-        return  e1.posx < e2.posx + e2.w &&
-                e2.posx < e1.posx + e1.w &&
-                e1.posy < e2.posy + e2.h &&
-                e2.posy < e1.posy + e1.h;
+        return  e1.pos.x < e2.pos.x + e2.size &&
+                e2.pos.x < e1.pos.x + e1.size &&
+                e1.pos.y < e2.pos.y + e2.size &&
+                e2.pos.y < e1.pos.y + e1.size;
 
     }
 
     public boolean isInWall(Map map) {
-        return map.arr[(int) posx][(int) posy] != 0 ||
-            map.arr[(int) posx][(int) (posy + h)] != 0 ||
-            map.arr[(int) (posx + w)][(int) posy] != 0 ||
-            map.arr[(int) (posx + w)][(int) (posy + h)] != 0;
+        return map.arr[(int) (pos.y - size/2)][(int) (pos.x - size/2)] != 0 ||
+            map.arr[(int) (pos.y - size/2)][(int) (pos.x + size/2)] != 0 ||
+            map.arr[(int) (pos.y + size/2)][(int) (pos.x - size/2)] != 0 ||
+            map.arr[(int) (pos.y + size/2)][(int) (pos.x + size/2)] != 0;
     }
 
     /**
@@ -54,7 +42,7 @@ abstract public class Entity implements Drawable{
     abstract public void collide();
 
     @Override
-    public float getDistFromCam(GameCamera cam) {
+    public float getDistFromCam(Player cam) {
         return 0;
     }
 
@@ -62,4 +50,6 @@ abstract public class Entity implements Drawable{
     public void draw() {
 
     }
+
+    abstract void update(Map map);
 }

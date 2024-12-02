@@ -1,11 +1,9 @@
 package io.github.gra_doom;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
+import io.github.gra_doom.entity.Entity;
+import io.github.gra_doom.Map;
 
 /**
  * Debug renderer for viewing actual 2d scene from top-down view
@@ -31,15 +29,16 @@ public class DebugRenderer extends Renderer {
         shapeRenderer.end();
     }
 
-    private void drawCam(GameCamera cam) {
+    private void drawCam(Player cam, Map map) {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.GREEN);
-        shapeRenderer.circle(cam.pos.x * cellSize, cam.pos.y * cellSize, cellSize/4.0f);
+        //shapeRenderer.circle(cam.pos.x * cellSize, cam.pos.y * cellSize, cellSize/4.0f);
         shapeRenderer.line(cam.pos.x * cellSize, cam.pos.y * cellSize, (cam.pos.x + (cam.dir.x + cam.plane.x)*3)*cellSize,
             (cam.pos.y + (cam.dir.y + cam.plane.y)*3)*cellSize);
         shapeRenderer.line(cam.pos.x * cellSize, cam.pos.y * cellSize, (cam.pos.x + (cam.dir.x - cam.plane.x)*3)*cellSize,
             (cam.pos.y + (cam.dir.y - cam.plane.y)*3)*cellSize);
         shapeRenderer.end();
+        drawHitBox(cam, map);
     }
 
     /**
@@ -56,7 +55,7 @@ public class DebugRenderer extends Renderer {
         shapeRenderer.end();
 
         drawMap(map);
-        drawCam(map.cam);
+        drawCam(map.player, map);
         frameBuffer.end();
 
     }
@@ -66,6 +65,14 @@ public class DebugRenderer extends Renderer {
         renderFrame(map);
         drawFrame();
 
+    }
+
+    private void drawHitBox(Entity e, Map map) {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        if (e.isInWall(map)) shapeRenderer.setColor(Color.RED);
+        else shapeRenderer.setColor(Color.GREEN);
+        shapeRenderer.rect((e.pos.x-e.size/2)*cellSize, (e.pos.y-e.size/2)*cellSize, e.size*cellSize, e.size*cellSize);
+        shapeRenderer.end();
     }
 
     @Override
