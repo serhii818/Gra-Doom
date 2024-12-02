@@ -2,9 +2,12 @@ package io.github.gra_doom;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.*;
+import io.github.gra_doom.entity.Character;
+import io.github.gra_doom.entity.Killable;
 import io.github.gra_doom.entity.MoveableEntity;
 
-public class Player extends MoveableEntity {
+public class Player extends Character {
+
 
     Vector2 dir;
     Vector2 plane;
@@ -20,16 +23,16 @@ public class Player extends MoveableEntity {
     private float frameTime;
 
 
-    public Player(Vector2 pos, Vector2 dir, Vector2 plane, float size, Pixmap sprite) {
-        super(pos, size, sprite);
+    public Player(Vector2 pos, Vector2 dir, Vector2 plane, float size, Pixmap sprite, float maxHealth) {
+        super(pos, size, sprite, maxHealth);
         this.dir = dir;
         this.plane = plane;
-        this.oldPos = new Vector2(0, 0);
+
     }
 
     public static Player makePlayer() {
         return new Player(new Vector2(14.4f, 10.8f), new Vector2(-1, 0),
-            new Vector2(0, 0.66f), 0.5f, new Pixmap(1, 1, Pixmap.Format.RGBA8888));
+            new Vector2(0, 0.66f), 0.5f, new Pixmap(1, 1, Pixmap.Format.RGBA8888), 100);
     }
 
     @Override
@@ -88,4 +91,6 @@ public class Player extends MoveableEntity {
     public void collide() {
 
     }
+
+
 }

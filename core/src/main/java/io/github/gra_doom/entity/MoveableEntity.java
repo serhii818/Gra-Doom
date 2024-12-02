@@ -8,8 +8,16 @@ abstract public class MoveableEntity extends Entity {
     public Vector2 vel;
     public Vector2 oldPos;
 
+    public MoveableEntity() {
+        super();
+        vel = new Vector2(0, 0);
+        oldPos = new Vector2(0, 0);
+    }
+
     public MoveableEntity( Vector2 pos,  float size, Pixmap sprite) {
         super(pos, size, sprite);
+        vel = new Vector2(0, 0);
+        oldPos = new Vector2(0, 0);
     }
 
     public void update(Map map) {

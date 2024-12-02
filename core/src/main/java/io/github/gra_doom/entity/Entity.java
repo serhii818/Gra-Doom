@@ -14,6 +14,12 @@ abstract public class Entity implements Drawable, Serializable {
     public float size;
     public Pixmap sprite;
 
+    public Entity() {
+        pos = new Vector2(0, 0);
+        size = 1;
+        sprite = new Pixmap(0, 0, Pixmap.Format.RGBA8888);
+    }
+
     public Entity( Vector2 pos,  float size, Pixmap sprite) {
         this.pos = pos;
         this.size = size;
