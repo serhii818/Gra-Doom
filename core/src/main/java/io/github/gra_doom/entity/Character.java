@@ -15,8 +15,8 @@ abstract public class Character extends MoveableEntity implements Killable{
         avile = true;
     }
 
-    public Character(Vector2 pos, float size, Pixmap sprite, float maxHealth) {
-        super(pos, size, sprite);
+    public Character(Vector2 pos, float size, String spritePath, float maxHealth) {
+        super(pos, size, spritePath);
         this.maxHealth = maxHealth;
         this.health = maxHealth;
         this.avile = true;

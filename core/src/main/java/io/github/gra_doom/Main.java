@@ -3,8 +3,10 @@ package io.github.gra_doom;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import io.github.gra_doom.entity.Enemy;
 
 public class Main extends ApplicationAdapter {
     Map selectedMap;
@@ -22,8 +24,8 @@ public class Main extends ApplicationAdapter {
      */
     @Override
     public void create() {
-        // test
-        // preparing window renderers, Game camera and map
+
+        // preparing window renderers
         Texture[] textures = new Texture[8];
         String[] texture_path = {
             "eagle",
@@ -37,7 +39,6 @@ public class Main extends ApplicationAdapter {
         };
         for (int i = 0; i < texture_path.length; i++) {
             textures[i] = new Texture(Gdx.files.internal("pics/" + texture_path[i] + ".png"));
-
         }
 
         Gdx.graphics.setWindowedMode(1600, 800);
@@ -47,11 +48,10 @@ public class Main extends ApplicationAdapter {
         rc.setMode(Renderer.DrawMode.FULL_WINDOW);
         ((RayCaster)rc).setDrawFloorEnabled(false);
 
+        // preparing player
         cam = Player.makePlayer();
-        keyboardController = new KeyboardController(cam);
 
-        Gdx.input.setInputProcessor(keyboardController);
-
+        // prepare map
         int[][] arr = {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -80,7 +80,11 @@ public class Main extends ApplicationAdapter {
         };
         selectedMap = new Map(arr, cam);
 
-        // ----
+        keyboardController = new KeyboardController(selectedMap.getPlayer());
+        Gdx.input.setInputProcessor(keyboardController);
+
+        selectedMap.addEntity(new Enemy());
+
     }
 
     /**

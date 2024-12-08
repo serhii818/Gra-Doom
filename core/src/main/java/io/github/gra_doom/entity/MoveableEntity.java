@@ -20,12 +20,13 @@ abstract public class MoveableEntity extends Entity {
         oldPos = new Vector2(0, 0);
     }
 
-    public MoveableEntity( Vector2 pos,  float size, Pixmap sprite) {
-        super(pos, size, sprite);
+    public MoveableEntity( Vector2 pos,  float size, String spritePath) {
+        super(pos, size, spritePath);
         vel = new Vector2(0, 0);
         oldPos = new Vector2(0, 0);
     }
 
+    @Override
     public void update(Map map) {
         long currentTime = System.nanoTime();
         // delta time for stable movement for different fps
@@ -40,6 +41,14 @@ abstract public class MoveableEntity extends Entity {
 
         pos.y += vel.y * speed * frameTime;
         if (isInWall(map)) pos.y = oldPos.y;
+
+        for (Entity e : map.entities) {
+            if (e != this) {
+                if (isColliding(this, e)) {
+                    pos.set(oldPos);
+                }
+            }
+        }
 
         // TODO check for any entity collision
     }

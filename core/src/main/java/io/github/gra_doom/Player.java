@@ -23,8 +23,8 @@ public class Player extends Character {
     private float frameTime;
 
 
-    public Player(Vector2 pos, Vector2 dir, Vector2 plane, float size, Pixmap sprite, float maxHealth) {
-        super(pos, size, sprite, maxHealth);
+    public Player(Vector2 pos, Vector2 dir, Vector2 plane, float size, String spritePath, float maxHealth) {
+        super(pos, size, spritePath, maxHealth);
         this.dir = dir;
         this.plane = plane;
 
@@ -32,7 +32,7 @@ public class Player extends Character {
 
     public static Player makePlayer() {
         return new Player(new Vector2(14.4f, 10.8f), new Vector2(-1, 0),
-            new Vector2(0, 0.66f), 0.5f, new Pixmap(1, 1, Pixmap.Format.RGBA8888), 100);
+            new Vector2(0, 0.66f), 0.5f, "", 100);
     }
 
     @Override
@@ -85,6 +85,7 @@ public class Player extends Character {
             pos.y += dir.x * movingAmount/2;
             if (isInWall(map)) pos.y = oldPos.y;
     	}
+
     }
 
     @Override

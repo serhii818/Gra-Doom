@@ -4,7 +4,7 @@ import java.lang.Character;
 
 public class PickUpItem {
 
-    void pick(Character entity) {
+    void pick(Character byEntity) {
 
     }
 }

@@ -236,7 +236,6 @@ public class RayCaster extends Renderer implements Disposable {
         if (drawMode!=DrawMode.NONE) {
             frame = new Texture(buffer);
             TextureRegion frameT = new TextureRegion(frame);
-            System.out.println(frameT.getTexture().getWidth());
             batch.begin();
             //frameT.flip(false, true);
             batch.draw(
