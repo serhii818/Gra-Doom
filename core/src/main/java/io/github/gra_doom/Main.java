@@ -79,11 +79,13 @@ public class Main extends ApplicationAdapter {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
         };
         selectedMap = new Map(arr, cam);
+        selectedMap.addEntity(new Enemy(new Vector2(2f, 2f), 0.5f, "pics/barrel.png", 100));
+        selectedMap.addEntity(new Enemy(new Vector2(5f, 5f), 0.5f, "pics/barrel.png", 100));
+        selectedMap.addEntity(new Enemy(new Vector2(2f, 5f), 0.5f, "pics/barrel.png", 100));
+        selectedMap.addEntity(new Enemy(new Vector2(12f, 5f), 0.5f, "pics/barrel.png", 100));
 
         keyboardController = new KeyboardController(selectedMap.getPlayer());
         Gdx.input.setInputProcessor(keyboardController);
-
-        selectedMap.addEntity(new Enemy());
 
     }
 

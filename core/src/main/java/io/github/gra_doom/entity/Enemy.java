@@ -1,5 +1,7 @@
 package io.github.gra_doom.entity;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class Enemy extends Character{
 
 
@@ -7,8 +9,17 @@ public class Enemy extends Character{
         super();
     }
 
+    public Enemy(Vector2 pos, float size, String spritePath, float maxHealth) {
+        super(pos, size, spritePath, maxHealth);
+    }
+
     @Override
     public void collide() {
 
+    }
+
+    @Override
+    public String toString() {
+        return "Enemy:" + super.toString();
     }
 }

@@ -8,7 +8,7 @@ import io.github.gra_doom.Map;
 
 import java.io.Serializable;
 
-abstract public class Entity implements Drawable, Serializable {
+abstract public class Entity implements Serializable {
     public Vector2 pos;
     public float size;
     public transient Pixmap sprite;
@@ -56,12 +56,10 @@ abstract public class Entity implements Drawable, Serializable {
      */
     abstract public void collide();
 
-    @Override
     public float getDistFromCam(Player cam) {
-        return 0;
+        return (cam.pos.x - pos.x)*(cam.pos.x - pos.x) + (cam.pos.y - pos.y)*(cam.pos.y - pos.y);
     }
 
-    @Override
     public void draw() {
 
     }
@@ -77,5 +75,10 @@ abstract public class Entity implements Drawable, Serializable {
     public void initializeSprite() {
         if (!spritePath.isEmpty()) this.sprite = new Pixmap(Gdx.files.internal(this.spritePath));
         else this.sprite = new Pixmap(0, 0, Pixmap.Format.RGBA8888);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("pos:%s, size:%f, spritePath:%s", pos.toString(), size, spritePath);
     }
 }
