@@ -11,9 +11,6 @@ abstract public class MoveableEntity extends Entity {
     // must always be normalized (must have lenght 1)
     public Vector2 vel;
     public Vector2 oldPos;
-
-    private long lastFrameTime;
-
     protected float speed;
 
     public MoveableEntity() {
@@ -66,13 +63,17 @@ abstract public class MoveableEntity extends Entity {
     }
 
     public void setVel(Vector2 vel) {
-        this.vel = vel;
+        this.vel.set(vel);
+        this.vel.setLength(1);
     }
 
     public void setVel(float x, float y) {
         this.vel.x = x;
         this.vel.y = y;
+        this.vel.setLength(1);
     }
+
+
 
     public float getSpeed() {
         return speed;

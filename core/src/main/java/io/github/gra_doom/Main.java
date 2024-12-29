@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import io.github.gra_doom.entity.Enemy;
+import io.github.gra_doom.entity.*;
 
 public class Main extends ApplicationAdapter {
     Map selectedMap;
@@ -56,6 +56,9 @@ public class Main extends ApplicationAdapter {
 
         // preparing player
         cam = Player.makePlayer();
+        Projectile p = new Projectile(new Vector2(0, 0), 0.5f, "pics/barrel.png", 2,25, true);
+        Weapon pw = new ProjectileWeapon(20, AmmoType.PISTOL, p);
+        cam.setWeapon(pw);
 
         // prepare map
         int[][] arr = {

@@ -38,9 +38,7 @@ public class KeyboardController implements InputProcessor{
 			cam.movingLeft = true;
 			break;
         case Input.Keys.SPACE:
-            Projectile p = new Projectile(cam.pos.cpy(), 0.5f, "pics/barrel.png", 1,10, true);
-            p.setVel(cam.dir.cpy());
-            map.addEntity(p);
+            cam.setShooting(true);
             break;
 		}
 		return true;
@@ -68,6 +66,9 @@ public class KeyboardController implements InputProcessor{
     		case Input.Keys.A:
     			cam.movingLeft = false;
     			break;
+            case Input.Keys.SPACE:
+                cam.setShooting(false);
+                break;
         }
         return true;
     }

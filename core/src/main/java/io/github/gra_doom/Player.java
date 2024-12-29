@@ -7,8 +7,6 @@ import io.github.gra_doom.entity.Character;
 
 public class Player extends Character {
 
-
-    Vector2 dir;
     Vector2 plane;
 
     public boolean rotatingRight, rotatingLeft;
@@ -83,6 +81,8 @@ public class Player extends Character {
         for (Entity e : map.entities) {
             collide(e);
         }
+        if (hasWeapon()) weapon.updateFrameCount();
+        if (isShooting()) shoot(map);
     }
 
     @Override
@@ -109,6 +109,5 @@ public class Player extends Character {
         }
 
     }
-
 
 }

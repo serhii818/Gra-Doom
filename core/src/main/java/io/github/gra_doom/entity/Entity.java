@@ -110,4 +110,13 @@ abstract public class Entity implements Serializable {
     public void selfDestroy() {
         setShouldDelete(true);
     }
+
+    public void setPos(Vector2 pos) {
+        this.pos = pos;
+    }
+
+    public void setPos(float x, float y) {
+        this.pos.x = x;
+        this.pos.y = y;
+    }
 }

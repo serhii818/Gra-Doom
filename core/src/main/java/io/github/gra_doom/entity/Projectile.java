@@ -11,8 +11,8 @@ public class Projectile extends MoveableEntity{
 
     public Projectile() {
         super();
-        vel = new Vector2(0, 0);
-        oldPos = new Vector2(0, 0);
+        damage = 0;
+        belongsToPlayer = false;
     }
 
     public Projectile( Vector2 pos,  float size, String spritePath, float speed, float damage, boolean belongsToPlayer) {
@@ -20,6 +20,21 @@ public class Projectile extends MoveableEntity{
         this.damage = damage;
         this.belongsToPlayer = belongsToPlayer;
     }
+
+    public Projectile(Projectile other) {
+        this.damage = other.damage;
+        this.belongsToPlayer = other.belongsToPlayer;
+        this.vel = new Vector2(other.vel);
+        this.speed = other.speed;
+        this.pos = new Vector2(other.pos);
+        this.oldPos = new Vector2(other.oldPos);
+        this.size = other.size;
+        this.shouldDelete = other.shouldDelete;
+        this.spritePath = other.spritePath;
+        this.initializeSprite();
+    }
+
+
 
     @Override
     public void update(Map map, float frameTime) {
@@ -49,5 +64,13 @@ public class Projectile extends MoveableEntity{
                 }
             }
         }
+    }
+
+    public float getDamage() {
+        return damage;
+    }
+
+    public void setDamage(float damage) {
+        this.damage = damage;
     }
 }
