@@ -1,5 +1,11 @@
 package io.github.gra_doom;
 
+/*
+* TODO write player pickup item
+* TODO Weapoon
+* TODO hitscan weapon
+*/
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -79,12 +85,12 @@ public class Main extends ApplicationAdapter {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
         };
         selectedMap = new Map(arr, cam);
-        selectedMap.addEntity(new Enemy(new Vector2(2f, 2f), 0.5f, "pics/barrel.png", 100));
-        selectedMap.addEntity(new Enemy(new Vector2(5f, 5f), 0.5f, "pics/barrel.png", 100));
-        selectedMap.addEntity(new Enemy(new Vector2(2f, 5f), 0.5f, "pics/barrel.png", 100));
-        selectedMap.addEntity(new Enemy(new Vector2(12f, 5f), 0.5f, "pics/barrel.png", 100));
+        selectedMap.addEntity(new Enemy(new Vector2(2f, 2f), 0.5f, "pics/barrel.png", 1, 100));
+        selectedMap.addEntity(new Enemy(new Vector2(5f, 5f), 0.5f, "pics/barrel.png", 1, 100));
+        selectedMap.addEntity(new Enemy(new Vector2(2f, 5f), 0.5f, "pics/barrel.png", 1, 100));
+        selectedMap.addEntity(new Enemy(new Vector2(12f, 5f), 0.5f, "pics/barrel.png", 1, 100));
 
-        keyboardController = new KeyboardController(selectedMap.getPlayer());
+        keyboardController = new KeyboardController(selectedMap.getPlayer(), selectedMap);
         Gdx.input.setInputProcessor(keyboardController);
 
     }

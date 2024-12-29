@@ -8,14 +8,22 @@ import io.github.gra_doom.Map;
 
 import java.io.Serializable;
 
+/**
+ * Base class for all entities, contains information about: position, size, sprite data and flat for deletion from
+ * entity array in Map object
+ */
 abstract public class Entity implements Serializable {
     public Vector2 pos;
     public float size;
+
     public transient Pixmap sprite;
-    public String spritePath; // internal file path (inside assets folder)
+    public String spritePath; // internal file path (inside assets' folder)
 
-    public boolean shouldDelete;
+    public boolean shouldDelete; // is set to true on next iteration in update method of Map object will be deleted from array
 
+    /**
+     * Default constructor, created entity at (0, 0) of size 1, with no sprite
+     */
     public Entity() {
         pos = new Vector2(0, 0);
         size = 1;
@@ -24,6 +32,12 @@ abstract public class Entity implements Serializable {
         shouldDelete = false;
     }
 
+    /**
+     * Entity constructor
+     * @param pos position on map where single unit is one square on map, should have only positive values
+     * @param size size for collisions and interpreted as width and height of box
+     * @param spritePath path for sprite, use initializeSprite to update sprite Pixmap
+     */
     public Entity( Vector2 pos,  float size, String spritePath) {
         this.pos = pos;
         this.size = size;
@@ -32,6 +46,9 @@ abstract public class Entity implements Serializable {
         this.shouldDelete = false;
     }
 
+    /**
+     * Check if two entities are colliding
+     */
     public static boolean isColliding(Entity e1, Entity e2) {
         return  e1.pos.x < e2.pos.x + e2.size &&
                 e2.pos.x < e1.pos.x + e1.size &&
@@ -41,7 +58,7 @@ abstract public class Entity implements Serializable {
     }
 
     /**
-     * Tells if the object inside the wall
+     * Tells if the Entity inside the wall
      * @param map map that object is inside of
      */
     public boolean isInWall(Map map) {
@@ -52,22 +69,23 @@ abstract public class Entity implements Serializable {
     }
 
     /**
-     * describes unique interactions with different object
+     * describes unique interactions with different Entities
      */
-    abstract public void collide();
+    abstract public void collide(Entity e);
 
+    /**
+     * returns distance of Entity from Player (player and camera are the same object)
+     * @param cam the player
+     * @return distance
+     */
     public float getDistFromCam(Player cam) {
         return (cam.pos.x - pos.x)*(cam.pos.x - pos.x) + (cam.pos.y - pos.y)*(cam.pos.y - pos.y);
     }
 
-    public void draw() {
-
-    }
-
     /**
-     * Updates object's position
+     * Updates object's position, state, etc
      */
-    public abstract void update(Map map);
+    public abstract void update(Map map, float frameTime);
 
     /**
      * Sets Pixmap Sprite of object after deserialization and initialization
@@ -80,5 +98,16 @@ abstract public class Entity implements Serializable {
     @Override
     public String toString() {
         return String.format("pos:%s, size:%f, spritePath:%s", pos.toString(), size, spritePath);
+    }
+
+    public void setShouldDelete(boolean shouldDelete) {
+        this.shouldDelete = shouldDelete;
+    }
+
+    /**
+     * sets shouldDelete to true, so on next iteration of update method in Map, Map will remove that Entity from array
+     */
+    public void selfDestroy() {
+        setShouldDelete(true);
     }
 }

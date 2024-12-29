@@ -1,26 +1,33 @@
 package io.github.gra_doom.entity;
 
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.Vector2;
+import io.github.gra_doom.Map;
 
 abstract public class Character extends MoveableEntity implements Killable{
     float health;
     float maxHealth;
-    boolean avile;
+    boolean alive;
 
     public Character() {
         super();
         health = 100;
         maxHealth = 100;
-        avile = true;
+        alive = true;
     }
 
-    public Character(Vector2 pos, float size, String spritePath, float maxHealth) {
-        super(pos, size, spritePath);
+    public Character(Vector2 pos, float size, String spritePath, float speed, float maxHealth) {
+        super(pos, size, spritePath, speed);
         this.maxHealth = maxHealth;
         this.health = maxHealth;
-        this.avile = true;
+        this.alive = true;
     }
+
+    @Override
+    public void update(Map map, float frameTime) {
+        super.update(map, frameTime);
+        if (!alive) selfDestroy();
+    }
+
 
     @Override
     public void applyDamage(float damage) {
@@ -64,13 +71,13 @@ abstract public class Character extends MoveableEntity implements Killable{
 
     @Override
     public void updateLifeState() {
-        if (getHealth() <= 0) avile = false;
-        else avile = true;
+        if (getHealth() <= 0) alive = false;
+        else alive = true;
         if (health > maxHealth) health = maxHealth;
     }
 
     @Override
     public boolean isAlive() {
-        return avile;
+        return alive;
     }
 }

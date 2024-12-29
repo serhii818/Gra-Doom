@@ -1,6 +1,7 @@
 package io.github.gra_doom;
 
 import io.github.gra_doom.entity.Entity;
+import io.github.gra_doom.entity.PickUpItem;
 
 import java.io.*;
 import java.util.Iterator;
@@ -11,6 +12,8 @@ public class Map implements Serializable {
     Player player;
     static final String savePath = "Maps/";
     public LinkedList<Entity> entities;
+    public LinkedList<PickUpItem> pickUpItems;
+    private long lastFrameTime;
 
     public Map(int[][] arr, Player player) {
         this.arr = arr;
@@ -29,22 +32,31 @@ public class Map implements Serializable {
     }
 
     public void addEntity(Entity e) {
-        entities.add(e);
+        if (!(e instanceof PickUpItem)) {
+            entities.add(e);
+        }
+    }
+
+    public void addPickUpItem(PickUpItem p) {
+        pickUpItems.add(p);
     }
 
     public void update() {
-        player.update(this);
+        long currentTime = System.nanoTime();
+        // delta time for stable movement for different fps
+        float frameTime = (currentTime - lastFrameTime) / 1000000000.0f;
+        lastFrameTime = currentTime;
+
+        player.update(this, frameTime);
 
         Iterator<Entity> iterator = entities.iterator();
         while(iterator.hasNext()) {
             Entity e = iterator.next();
-            e.update(this);
+            e.update(this, frameTime);
 
             if (e.shouldDelete) {
                 iterator.remove();
             }
-
-            // call iterator.remove() to remove current element
         }
     }
 

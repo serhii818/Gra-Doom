@@ -2,14 +2,18 @@ package io.github.gra_doom;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.math.Vector2;
+import io.github.gra_doom.entity.Projectile;
 
 public class KeyboardController implements InputProcessor{
 
 	private Player cam;
+    private Map map;
 
 
-	public KeyboardController(Player cam) {
+	public KeyboardController(Player cam, Map map) {
 		this.cam = cam;
+        this.map = map;
 	}
 
 	@Override
@@ -33,12 +37,18 @@ public class KeyboardController implements InputProcessor{
 		case Input.Keys.A:
 			cam.movingLeft = true;
 			break;
+        case Input.Keys.SPACE:
+            Projectile p = new Projectile(cam.pos.cpy(), 0.5f, "pics/barrel.png", 1,10, true);
+            p.setVel(cam.dir.cpy());
+            map.addEntity(p);
+            break;
 		}
 		return true;
 	}
 
     @Override
     public boolean keyUp(int keycode) {
+
         switch (keycode) {
             case Input.Keys.RIGHT:
                 cam.rotatingLeft = false;

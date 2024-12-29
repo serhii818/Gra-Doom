@@ -2,9 +2,8 @@ package io.github.gra_doom;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.*;
+import io.github.gra_doom.entity.*;
 import io.github.gra_doom.entity.Character;
-import io.github.gra_doom.entity.Killable;
-import io.github.gra_doom.entity.MoveableEntity;
 
 public class Player extends Character {
 
@@ -24,7 +23,7 @@ public class Player extends Character {
 
 
     public Player(Vector2 pos, Vector2 dir, Vector2 plane, float size, String spritePath, float maxHealth) {
-        super(pos, size, spritePath, maxHealth);
+        super(pos, size, spritePath, 0, maxHealth);
         this.dir = dir;
         this.plane = plane;
 
@@ -36,12 +35,7 @@ public class Player extends Character {
     }
 
     @Override
-    public void update(Map map) {
-        long currentTime = System.nanoTime();
-        frameTime = (currentTime - lastFrameTime) / 1000000000.0f;
-        lastFrameTime = currentTime;
-
-
+    public void update(Map map, float frameTime) {
     	float movingAmount = movingSpeed * frameTime;
     	float rotateAmount = rotationSpeed * frameTime;
 
@@ -70,7 +64,7 @@ public class Player extends Character {
             if (isInWall(map)) pos.y = oldPos.y;
     	}
 
-        oldPos.set(pos);
+        //oldPos.set(pos);
     	if (movingRight) {
     	    pos.x += dir.y * movingAmount/2;
             if (isInWall(map)) pos.x = oldPos.x;
@@ -86,10 +80,33 @@ public class Player extends Character {
             if (isInWall(map)) pos.y = oldPos.y;
     	}
 
+        for (Entity e : map.entities) {
+            collide(e);
+        }
     }
 
     @Override
-    public void collide() {
+    public void collide(Entity e) {
+        if (!(e instanceof Projectile)) {
+            if (e instanceof PickUpItem p) {
+                p.pick(this);
+                p.selfDestroy();
+            }
+            else {
+                if (isColliding(this, e)) {
+                    float x = pos.x;
+                    pos.x = oldPos.x;
+                    if (isColliding(this, e)) {
+                        pos.x = x;
+                        pos.y = oldPos.y;
+                        if (isColliding(this, e)) {
+                            pos.x = oldPos.x;
+                        }
+                    }
+
+                }
+            }
+        }
 
     }
 

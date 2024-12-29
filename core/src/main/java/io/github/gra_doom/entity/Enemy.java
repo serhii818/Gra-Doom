@@ -9,13 +9,8 @@ public class Enemy extends Character{
         super();
     }
 
-    public Enemy(Vector2 pos, float size, String spritePath, float maxHealth) {
-        super(pos, size, spritePath, maxHealth);
-    }
-
-    @Override
-    public void collide() {
-
+    public Enemy(Vector2 pos, float size, String spritePath, float speed, float maxHealth) {
+        super(pos, size, spritePath, speed, maxHealth);
     }
 
     @Override
