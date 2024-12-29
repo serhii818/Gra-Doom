@@ -56,8 +56,9 @@ public class Main extends ApplicationAdapter {
 
         // preparing player
         cam = Player.makePlayer();
-        Projectile p = new Projectile(new Vector2(0, 0), 0.5f, "pics/barrel.png", 2,25, true);
-        Weapon pw = new ProjectileWeapon(20, AmmoType.PISTOL, p);
+        //Projectile p = new Projectile(new Vector2(0, 0), 0.5f, "pics/barrel.png", 2,25, true);
+        //Weapon pw = new ProjectileWeapon(20, AmmoType.PISTOL, p);
+        Weapon pw = new HitScanWeapon(30, AmmoType.PISTOL, 25);
         cam.setWeapon(pw);
 
         // prepare map
@@ -88,9 +89,9 @@ public class Main extends ApplicationAdapter {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
         };
         selectedMap = new Map(arr, cam);
-        selectedMap.addEntity(new Enemy(new Vector2(2f, 2f), 0.5f, "pics/barrel.png", 1, 100));
-        selectedMap.addEntity(new Enemy(new Vector2(5f, 5f), 0.5f, "pics/barrel.png", 1, 100));
-        selectedMap.addEntity(new Enemy(new Vector2(2f, 5f), 0.5f, "pics/barrel.png", 1, 100));
+        //selectedMap.addEntity(new Enemy(new Vector2(2f, 2f), 0.5f, "pics/barrel.png", 1, 100));
+        //selectedMap.addEntity(new Enemy(new Vector2(5f, 5f), 0.5f, "pics/barrel.png", 1, 100));
+        //selectedMap.addEntity(new Enemy(new Vector2(2f, 5f), 0.5f, "pics/barrel.png", 1, 100));
         selectedMap.addEntity(new Enemy(new Vector2(12f, 5f), 0.5f, "pics/barrel.png", 1, 100));
 
         keyboardController = new KeyboardController(selectedMap.getPlayer(), selectedMap);

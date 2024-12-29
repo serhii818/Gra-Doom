@@ -7,7 +7,7 @@ import io.github.gra_doom.entity.Character;
 
 public class Player extends Character {
 
-    Vector2 plane;
+    public Vector2 plane;
 
     public boolean rotatingRight, rotatingLeft;
     public boolean movingForward, movingBackward, movingRight, movingLeft;

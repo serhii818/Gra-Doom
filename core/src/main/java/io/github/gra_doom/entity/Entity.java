@@ -74,9 +74,9 @@ abstract public class Entity implements Serializable {
     abstract public void collide(Entity e);
 
     /**
-     * returns distance of Entity from Player (player and camera are the same object)
+     * returns squared distance of Entity from Player (player and camera are the same object)
      * @param cam the player
-     * @return distance
+     * @return squared distance
      */
     public float getDistFromCam(Player cam) {
         return (cam.pos.x - pos.x)*(cam.pos.x - pos.x) + (cam.pos.y - pos.y)*(cam.pos.y - pos.y);
