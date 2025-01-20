@@ -135,7 +135,7 @@ public class HitScanWeapon extends Weapon{
 
         if (canShoot) {
             Character character = shootRay(map.getPlayer(), map, 0f);
-            character.applyDamage(damage);
+            if (character != null) character.applyDamage(damage);
         }
 
         return canShoot;

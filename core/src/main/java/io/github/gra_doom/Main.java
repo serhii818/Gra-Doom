@@ -20,6 +20,7 @@ public class Main extends ApplicationAdapter {
     // test data section
     Renderer dr;
     Renderer rc;
+    Renderer dov;
     // -----------------
 
     Player cam;
@@ -50,12 +51,15 @@ public class Main extends ApplicationAdapter {
         Gdx.graphics.setWindowedMode(1600, 800);
         dr = new DebugRenderer(20, 800, 400);
         rc = new RayCaster(800, 600, textures);
+        dov = new DebugOverlay(1600, 800);
         dr.setMode(Renderer.DrawMode.CORNER_UL);
         rc.setMode(Renderer.DrawMode.FULL_WINDOW);
+        dov.setMode(Renderer.DrawMode.FULL_WINDOW);
         ((RayCaster)rc).setDrawFloorEnabled(false);
 
         // preparing player
         cam = Player.makePlayer();
+        cam.applyDamage(40);
         //Projectile p = new Projectile(new Vector2(0, 0), 0.5f, "pics/barrel.png", 2,25, true);
         //Weapon pw = new ProjectileWeapon(20, AmmoType.PISTOL, p);
         Weapon pw = new HitScanWeapon(30, AmmoType.PISTOL, 25);
@@ -89,10 +93,12 @@ public class Main extends ApplicationAdapter {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
         };
         selectedMap = new Map(arr, cam);
-        //selectedMap.addEntity(new Enemy(new Vector2(2f, 2f), 0.5f, "pics/barrel.png", 1, 100));
-        //selectedMap.addEntity(new Enemy(new Vector2(5f, 5f), 0.5f, "pics/barrel.png", 1, 100));
-        //selectedMap.addEntity(new Enemy(new Vector2(2f, 5f), 0.5f, "pics/barrel.png", 1, 100));
+        selectedMap.addEntity(new Enemy(new Vector2(2f, 2f), 0.5f, "pics/barrel.png", 1, 100));
+        selectedMap.addEntity(new Enemy(new Vector2(5f, 5f), 0.5f, "pics/barrel.png", 1, 100));
+        selectedMap.addEntity(new Enemy(new Vector2(2f, 5f), 0.5f, "pics/barrel.png", 1, 100));
         selectedMap.addEntity(new Enemy(new Vector2(12f, 5f), 0.5f, "pics/barrel.png", 1, 100));
+        selectedMap.addEntity(new PickUpItem(new Vector2(12f, 5f), 0.5f, "pics/barrel.png", PickUpItem.Item.HEALTH25));
+        System.out.println(selectedMap.entities.size());
 
         keyboardController = new KeyboardController(selectedMap.getPlayer(), selectedMap);
         Gdx.input.setInputProcessor(keyboardController);
@@ -109,6 +115,7 @@ public class Main extends ApplicationAdapter {
         super.resize(width, height);
         rc.viewport.update(width, height, true);
         dr.viewport.update(width, height, true);
+        dov.viewport.update(width, height, true);
     }
 
     /**
@@ -128,6 +135,7 @@ public class Main extends ApplicationAdapter {
 
         rc.render(selectedMap);
         //dr.render(selectedMap);
+        dov.render(selectedMap);
     }
 
     /**

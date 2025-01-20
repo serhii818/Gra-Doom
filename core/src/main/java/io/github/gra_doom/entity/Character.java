@@ -99,6 +99,10 @@ abstract public class Character extends MoveableEntity implements Killable{
         this.weapon = weapon;
     }
 
+    public Weapon getWeapon() {
+        return weapon;
+    }
+
     public boolean hasWeapon() {
         return weapon != null;
     }

@@ -152,6 +152,10 @@ public class RayCaster extends Renderer implements Disposable {
 
             int texWidth = e.sprite.getWidth();
             int texHeight = e.sprite.getHeight();
+            float health_p = 0;
+            if (e instanceof io.github.gra_doom.entity.Character c) {
+                health_p = c.getHealth() / c.getMaxHealth();
+            }
 
             for(int stripe = drawStartX; stripe < drawEndX; stripe++) {
                 int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
@@ -165,8 +169,15 @@ public class RayCaster extends Renderer implements Disposable {
                     {
                         int d = (y) * 256 - height * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
                         int texY = ((d * texHeight) / spriteHeight) / 256;
-                        int color = e.sprite.getPixel(texX, texY);
-                        //if((color & 0x00FFFFFF) != 0) buffer[y][stripe] = color; //paint pixel if it isn't black, black is the invisible color
+                        int color;
+                        if (y > drawStartY+5 || health_p == 0) {
+                            color = e.sprite.getPixel(texX, texY);
+                        } else {
+                            if (((float)texX / texWidth) < health_p) color = Color.rgba8888(0, 1, 0, 1);
+                            else color = Color.rgba8888(1, 0, 0, 1);
+
+                        }
+
                         if ((color & 0xFFFFFF00) != 0) buffer.drawPixel(stripe, y, color);
                     }
             }

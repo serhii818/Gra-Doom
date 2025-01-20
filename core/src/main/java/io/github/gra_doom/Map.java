@@ -12,7 +12,6 @@ public class Map implements Serializable {
     Player player;
     static final String savePath = "Maps/";
     public LinkedList<Entity> entities;
-    public LinkedList<PickUpItem> pickUpItems;
     private long lastFrameTime;
 
     public Map(int[][] arr, Player player) {
@@ -32,14 +31,9 @@ public class Map implements Serializable {
     }
 
     public void addEntity(Entity e) {
-        if (!(e instanceof PickUpItem)) {
-            entities.add(e);
-        }
+        entities.add(e);
     }
 
-    public void addPickUpItem(PickUpItem p) {
-        pickUpItems.add(p);
-    }
 
     public void update() {
         long currentTime = System.nanoTime();

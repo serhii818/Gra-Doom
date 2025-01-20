@@ -30,4 +30,12 @@ abstract public class Weapon {
         if (frameCount > 0) frameCount--;
     }
 
+    @Override
+    public String toString() {
+        return "Weapon{" +
+            "coolDown=" + coolDown +
+            ", frameCount=" + frameCount +
+            ", ammoType=" + ammoType +
+            '}';
+    }
 }

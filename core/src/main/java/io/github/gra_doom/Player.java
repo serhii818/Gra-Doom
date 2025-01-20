@@ -89,8 +89,10 @@ public class Player extends Character {
     public void collide(Entity e) {
         if (!(e instanceof Projectile)) {
             if (e instanceof PickUpItem p) {
-                p.pick(this);
-                p.selfDestroy();
+                if (isColliding(this, p)) {
+                    p.pick(this);
+                    p.selfDestroy();
+                }
             }
             else {
                 if (isColliding(this, e)) {
