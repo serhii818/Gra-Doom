@@ -3,7 +3,9 @@ package io.github.gra_doom.entity;
 import com.badlogic.gdx.math.Vector2;
 import io.github.gra_doom.Map;
 
-abstract public class Weapon {
+import java.io.Serializable;
+
+abstract public class Weapon implements Serializable {
     int coolDown;
     int frameCount;
     AmmoType ammoType;

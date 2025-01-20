@@ -103,6 +103,8 @@ public class Main extends ApplicationAdapter {
         keyboardController = new KeyboardController(selectedMap.getPlayer(), selectedMap);
         Gdx.input.setInputProcessor(keyboardController);
 
+
+
     }
 
     /**

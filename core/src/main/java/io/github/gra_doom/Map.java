@@ -82,6 +82,7 @@ public class Map implements Serializable {
                 e.initializeSprite(); // Let's assume it works :)
             }
         } catch (IOException | ClassNotFoundException ex) {
+            System.out.println("fail!!!");
             System.out.println(ex.getMessage());
         }
 
