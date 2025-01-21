@@ -1,79 +1,77 @@
 package io.github.gra_doom;
 
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.github.gra_doom.entity.Entity;
-import io.github.gra_doom.Map;
 
 /**
- * Debug renderer for viewing actual 2d scene from top-down view
+ * Debug renderer for viewing actual 2D scene with zoom support.
  */
 public class DebugRenderer extends Renderer {
-    int cellSize;
+    private int cellSize;
+    private float zoom = 1.0f; // Default zoom level
 
     public DebugRenderer(int cellSize, int width, int height) {
         super(width, height);
         this.cellSize = cellSize;
     }
 
+
+    public void setZoom(float zoom) {
+        this.zoom = Math.max(0.1f, zoom); // Prevent zooming out too much
+    }
+
+    
+    public float getZoom() {
+        return zoom;
+    }
+    
+
     private void drawMap(Map map) {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.CYAN);
         for (int y = 0; y < map.arr.length; y++) {
             for (int x = 0; x < map.arr[y].length; x++) {
-                if (map.arr[y][x] != 0) {
-                    shapeRenderer.rect(x * cellSize, y * cellSize, cellSize, cellSize);
+                if (map.arr[y][x] != 0) { // Only render non-zero tiles
+                    float scaledCellSize = cellSize * zoom; // Adjust size based on zoom
+                    float posx = (x * scaledCellSize);
+                    float posy = (y * scaledCellSize);
+                    shapeRenderer.rect(posx, posy, scaledCellSize, scaledCellSize);
                 }
             }
         }
         shapeRenderer.end();
     }
 
-    private void drawCam(Player cam, Map map) {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.GREEN);
-        //shapeRenderer.circle(cam.pos.x * cellSize, cam.pos.y * cellSize, cellSize/4.0f);
-        shapeRenderer.line(cam.pos.x * cellSize, cam.pos.y * cellSize, (cam.pos.x + (cam.dir.x + cam.plane.x)*3)*cellSize,
-            (cam.pos.y + (cam.dir.y + cam.plane.y)*3)*cellSize);
-        shapeRenderer.line(cam.pos.x * cellSize, cam.pos.y * cellSize, (cam.pos.x + (cam.dir.x - cam.plane.x)*3)*cellSize,
-            (cam.pos.y + (cam.dir.y - cam.plane.y)*3)*cellSize);
-        shapeRenderer.end();
-        drawHitBox(cam, map);
-    }
-
     /**
-     * Render frame in frameBuffer before rendering it on screen
+     * Render the frame in the framebuffer before displaying on screen.
      */
     @Override
     public void renderFrame(Map map) {
         frameBuffer.begin();
         clearScreen();
 
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.BLUE);
-        shapeRenderer.rect(0, 0, width, height);
+        float scaledWidth = width * zoom;  // Adjust width for zoom
+        float scaledHeight = height * zoom; // Adjust height for zoom
+        shapeRenderer.rect(0, 0, scaledWidth, scaledHeight);
         shapeRenderer.end();
 
         drawMap(map);
-        drawCam(map.player, map);
         frameBuffer.end();
-
     }
+
 
     @Override
     public void render(Map map) {
         renderFrame(map);
         drawFrame();
-
     }
 
-    private void drawHitBox(Entity e, Map map) {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        if (e.isInWall(map)) shapeRenderer.setColor(Color.RED);
-        else shapeRenderer.setColor(Color.GREEN);
-        shapeRenderer.rect((e.pos.x-e.size/2)*cellSize, (e.pos.y-e.size/2)*cellSize, e.size*cellSize, e.size*cellSize);
-        shapeRenderer.end();
-    }
 
     @Override
     public void dispose() {

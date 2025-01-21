@@ -85,6 +85,8 @@ public class Player extends Character {
             pos.y += dir.x * movingAmount/2;
             if (isInWall(map)) pos.y = oldPos.y;
     	}
+    	
+    	
     }
 
     @Override

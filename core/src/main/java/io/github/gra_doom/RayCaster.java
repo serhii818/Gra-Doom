@@ -52,7 +52,7 @@ public class RayCaster extends Renderer implements Disposable {
 
 
         // floor casting
-        if (drawFloorEnabled) drawFloor(cam);
+        drawFloor(cam);
 
         // wall casting
         drawWalls(cam, map);

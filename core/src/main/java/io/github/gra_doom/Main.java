@@ -2,7 +2,9 @@ package io.github.gra_doom;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
@@ -16,6 +18,7 @@ public class Main extends ApplicationAdapter {
 
     Player cam;
     KeyboardController keyboardController;
+    MapEditorController MapEditorController;
 
     /**
      * Initialization method
@@ -39,47 +42,35 @@ public class Main extends ApplicationAdapter {
             textures[i] = new Texture(Gdx.files.internal("pics/" + texture_path[i] + ".png"));
 
         }
-
-        Gdx.graphics.setWindowedMode(1600, 800);
-        dr = new DebugRenderer(20, 800, 400);
+        //Wybieramy wielkosc mapy ( wpisanie wymiaru o wartosci 0 powoduje wczytanie mapy z pliku)
+        int mapWidth = 24;
+        int mapHeight = 24;
+        
+        cam = Player.makePlayer();
+        int[][] arr = MapEditor.loadMap("map.json", mapWidth, mapHeight);
+        selectedMap = new Map(arr, cam);
+        
+        
+        Gdx.graphics.setWindowedMode(840, 840);
+        dr = new DebugRenderer(20, selectedMap.arr[0].length * 20, selectedMap.arr.length * 20);
+        //dr = new DebugRenderer(20, 800, 400);
         rc = new RayCaster(800, 600, textures);
-        dr.setMode(Renderer.DrawMode.CORNER_UL);
+        dr.setMode(Renderer.DrawMode.FULL_WINDOW);
         rc.setMode(Renderer.DrawMode.FULL_WINDOW);
         ((RayCaster)rc).setDrawFloorEnabled(false);
 
-        cam = Player.makePlayer();
-        keyboardController = new KeyboardController(cam);
+        
+        //Edytor mapy - wybieramy MapEditorController, tryb gry - wybieramy keyboardController 
+        //keyboardController = new KeyboardController(cam);
+        int tileWidth = Gdx.graphics.getHeight() / mapWidth;
+        int tileHeight = Gdx.graphics.getWidth() / mapHeight;
+        MapEditorController = new MapEditorController(dr, tileWidth, tileHeight, selectedMap);
 
-        Gdx.input.setInputProcessor(keyboardController);
-
-        int[][] arr = {
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-            {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
-            {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-        };
-        selectedMap = new Map(arr, cam);
-
+        
+        //Edytor mapy - wybieramy MapEditorController, tryb gry - wybieramy keyboardController
+        //Gdx.input.setInputProcessor(keyboardController);
+        Gdx.input.setInputProcessor(MapEditorController);
+        
         // ----
     }
 
@@ -110,8 +101,8 @@ public class Main extends ApplicationAdapter {
 
         selectedMap.update();
 
-        rc.render(selectedMap);
-        //dr.render(selectedMap);
+        //rc.render(selectedMap);
+        dr.render(selectedMap);
     }
 
     /**
