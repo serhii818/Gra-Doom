@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -18,8 +19,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class MenuScreen implements Screen {
 
-    private static final int WORLD_WIDTH = 720;  // Szerokość świata gry
-    private static final int WORLD_HEIGHT = 480; // Wysokość świata gry
+    private static final int MENU_WIDTH = 780;  // Szerokość świata menu
+    private static final int MENU_HEIGHT = 480; // Wysokość świata menu
 
     private Stage stage;
     private Texture backgroundTexture;
@@ -27,106 +28,149 @@ public class MenuScreen implements Screen {
 
     @Override
     public void show() {
-        // Użyj FitViewport zamiast ScreenViewport
-        stage = new Stage(new FitViewport(WORLD_WIDTH, WORLD_HEIGHT));
+        try {
+            initializeViewport();
+
+            // Odtwórz muzykę
+            MusicManager.getInstance().playMusic();
+
+            // Zainicjalizuj batch (ponowne załadowanie w przypadku null)
+            if (batch == null) {
+                batch = new SpriteBatch();
+            }
+
+            createMenuButtons();
+
+        } catch (Exception e) {
+            System.err.println("Błąd inicjalizacji MenuScreen: " + e.getMessage());
+        }
+    }
+
+    private void initializeViewport() {
+        Gdx.graphics.setWindowedMode(MENU_WIDTH, MENU_HEIGHT);
+        stage = new Stage(new FitViewport(MENU_WIDTH, MENU_HEIGHT));
         Gdx.input.setInputProcessor(stage);
 
-        // Załaduj teksturę tła
         backgroundTexture = new Texture(Gdx.files.internal("doommenu.jpg"));
         batch = new SpriteBatch();
+    }
 
-        // Załaduj tekstury dla przycisków
+    private void createMenuButtons() {
         Texture startGameTexture = new Texture(Gdx.files.internal("texts/start-game.png"));
         Texture loadGameTexture = new Texture(Gdx.files.internal("texts/load-game.png"));
         Texture optionsTexture = new Texture(Gdx.files.internal("texts/options.png"));
         Texture exitGameTexture = new Texture(Gdx.files.internal("texts/exit-game.png"));
 
-        // Utwórz przyciski z tekstur
-        ImageButton startButton = new ImageButton(new TextureRegionDrawable(startGameTexture));
-        ImageButton loadGameButton = new ImageButton(new TextureRegionDrawable(loadGameTexture));
-        ImageButton optionsButton = new ImageButton(new TextureRegionDrawable(optionsTexture));
-        ImageButton exitButton = new ImageButton(new TextureRegionDrawable(exitGameTexture));
+        ImageButton startButton = Buttons.create(startGameTexture);
+        ImageButton loadGameButton = Buttons.create(loadGameTexture);
+        ImageButton optionsButton = Buttons.create(optionsTexture);
+        ImageButton exitButton = Buttons.create(exitGameTexture);
 
-        // Ustaw skalowanie i punkt odniesienia
-        setupButtonScaling(startButton);
-        setupButtonScaling(loadGameButton);
-        setupButtonScaling(optionsButton);
-        setupButtonScaling(exitButton);
+        // Listener dla Options
+        optionsButton.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                animateButtonsOffScreen(() -> {
+                    // Przełącz na OptionsScreen po animacji
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new OptionsScreen());
+                });
+                return true;
+            }
+        });
 
-        // Dodaj listener do animacji powiększania i zmniejszania
-        addHoverAnimation(startButton);
-        addHoverAnimation(loadGameButton);
-        addHoverAnimation(optionsButton);
-        addHoverAnimation(exitButton);
+        // Listener dla Exit
+        exitButton.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                animateButtonsOffScreen(() -> {
+                    // Zatrzymaj muzykę i wyjdź z gry
+                    MusicManager.getInstance().stopMusic();
+                    Gdx.app.exit();
+                });
+                return true;
+            }
+        });
 
-        // Ustawienia pozycji i układ na scenie
         Table table = new Table();
-        table.center(); // Wyśrodkuj tabelę
-        table.setFillParent(true); // Tabela wypełnia ekran
+        table.center();
+        table.setFillParent(true);
 
-        // Dodanie przycisków do tabeli
-        table.add(startButton).size(200, 60).padBottom(10).center();
+        table.add(startButton).padBottom(20).center();
         table.row();
-        table.add(loadGameButton).size(200, 60).padBottom(10).center();
+        table.add(loadGameButton).padBottom(20).center();
         table.row();
-        table.add(optionsButton).size(200, 60).padBottom(10).center();
+        table.add(optionsButton).padBottom(20).center();
         table.row();
-        table.add(exitButton).size(200, 60).center();
+        table.add(exitButton).center();
 
-        // Dodanie tabeli do sceny
         stage.addActor(table);
     }
 
-    private void setupButtonScaling(ImageButton button) {
-        button.setTransform(true); // Umożliwia transformacje (skalowanie, rotacje)
-        button.setOrigin(button.getWidth() / 2, button.getHeight() / 2); // Ustaw środek jako punkt odniesienia
-    }
+    private void animateButtonsOffScreen(Runnable onComplete) {
+        float screenWidth = Gdx.graphics.getWidth();
 
-    private void addHoverAnimation(ImageButton button) {
-        button.addListener(new InputListener() {
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                button.addAction(Actions.scaleTo(1.2f, 1.2f, 0.2f)); // Powiększenie przycisku
+        for (Actor actor : stage.getActors()) {
+            if (actor instanceof Table) {
+                Table table = (Table) actor;
+                for (Cell<?> cell : table.getCells()) {
+                    Actor button = cell.getActor();
+                    if (button != null) {
+                        // Dodaj animację przesunięcia w prawo poza ekran
+                        button.addAction(Actions.moveTo(screenWidth + button.getWidth(), button.getY(), 0.5f));
+                    }
+                }
+                // Dodaj akcję wywołującą callback po zakończeniu animacji
+                table.addAction(Actions.sequence(
+                    Actions.delay(0.5f), // Czekaj, aż przyciski znikną
+                    Actions.run(onComplete) // Wykonaj callback
+                ));
             }
-
-            @Override
-            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                button.addAction(Actions.scaleTo(1.0f, 1.0f, 0.2f)); // Powrót do oryginalnego rozmiaru
-            }
-        });
+        }
     }
 
     @Override
     public void render(float delta) {
-        // Czyszczenie ekranu
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Narysuj tło
+
+        if (batch == null) {
+            System.err.println("SpriteBatch is null!"); // Debugowanie
+            return;
+        }
+
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+
         batch.begin();
-        batch.draw(backgroundTexture, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+        batch.draw(backgroundTexture, 0, 0, screenWidth, screenHeight);
         batch.end();
 
-        // Rysowanie sceny
-        stage.act(delta);
-        stage.draw();
+        if (stage != null) { // Sprawdzenie istnienia stage
+            stage.act(delta);
+            stage.draw();
+        }
     }
-
     @Override
     public void resize(int width, int height) {
-        // Dostosowanie widoku do zmiany rozmiaru okna
-        stage.getViewport().update(width, height, true);
+        if (stage != null) {
+            stage.getViewport().update(width, height, true);
+        }
+    }
+
+
+    @Override
+    public void pause() {
     }
 
     @Override
-    public void pause() {}
-
-    @Override
-    public void resume() {}
+    public void resume() {
+    }
 
     @Override
     public void hide() {
-        // Czyszczenie zasobów sceny
-        stage.dispose();
+        if (stage != null) {
+            stage.dispose();
+        }
     }
 
     @Override
@@ -134,11 +178,13 @@ public class MenuScreen implements Screen {
         if (stage != null) {
             stage.dispose();
         }
-        if (backgroundTexture != null) {
-            backgroundTexture.dispose();
-        }
         if (batch != null) {
             batch.dispose();
+            batch = null;
+        }
+        if (backgroundTexture != null) {
+            backgroundTexture.dispose();
+            backgroundTexture = null;
         }
     }
 }

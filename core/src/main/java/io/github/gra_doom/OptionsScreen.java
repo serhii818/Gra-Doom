@@ -5,161 +5,151 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-
-
-
-
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class OptionsScreen implements Screen {
+
+    private static final int SCREEN_WIDTH = 780;
+    private static final int SCREEN_HEIGHT = 480;
+    private static final float ANIMATION_DURATION = 0.5f;
 
     private Stage stage;
     private SpriteBatch batch;
     private Texture backgroundTexture;
-    private BitmapFont font;
-    private Music backgroundMusic;
 
     @Override
     public void show() {
-        // Tworzymy SpriteBatch
+        if (batch == null) {
+            batch = new SpriteBatch();
+        }
+        stage = new Stage(new FitViewport(SCREEN_WIDTH, SCREEN_HEIGHT));
+        Gdx.input.setInputProcessor(stage);
+
         batch = new SpriteBatch();
+        backgroundTexture = new Texture(Gdx.files.internal("doommenu.jpg"));
 
-        // Załaduj tło
-        backgroundTexture = new Texture("doommenu.jpg");  // Załaduj obrazek tła
+        MusicManager.getInstance().playMusic();
 
-        // Załaduj czcionkę
-        font = new BitmapFont();
-        font.getData().setScale(2);
+        createButtons();
 
-        // Załaduj muzykę
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("DoomMenu.mp3"));
-        backgroundMusic.setLooping(true);
-        backgroundMusic.play();
+        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); // Dopasuj widok
+    }
 
-        // Tworzymy styl dla przycisków
-        TextButtonStyle textButtonStyle = new TextButtonStyle();
-        textButtonStyle.font = font;
+    private void createButtons() {
+        Texture volumeTexture = new Texture(Gdx.files.internal("texts/volume-settings.png"));
+        Texture controlTexture = new Texture(Gdx.files.internal("texts/control-settings.png"));
+        Texture menuTexture = new Texture(Gdx.files.internal("texts/exit.png"));
 
-        // Tworzymy styl dla etykiet i przypisujemy font
-        LabelStyle labelStyle = new LabelStyle();
-        labelStyle.font = font;  // Ważne - przypisanie czcionki do stylu
+        ImageButton volumeButton = Buttons.create(volumeTexture);
+        ImageButton controlButton = Buttons.create(controlTexture);
+        ImageButton menuButton = Buttons.create(menuTexture);
 
-        // Tworzymy etykietę
-        Label optionsLabel = new Label("Options", labelStyle);
-        optionsLabel.setFontScale(2); // Ustaw rozmiar czcionki dla etykiety
-
-        // Tworzymy przyciski
-        TextButton soundSettingsButton = new TextButton("Sound Settings", textButtonStyle);
-        TextButton controlsButton = new TextButton("Control Settings", textButtonStyle);
-        TextButton backToMenuButton = new TextButton("Exit to menu", textButtonStyle);
-
-        // Dodanie akcji do przycisków
-        soundSettingsButton.addListener(new ChangeListener() {
+        menuButton.addListener(new InputListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new SoundSettingsScreen());
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                animateButtonsOffScreen(() -> {
+                    // Przełącz na MenuScreen po zakończeniu animacji
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new MenuScreen());
+                });
+                return true;
             }
         });
 
-        controlsButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new ControlsScreen());
-            }
-        });
-
-        backToMenuButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new MenuScreen());
-            }
-        });
-
-        // Utwórz tabelę do rozmieszczenia przycisków
-        Table table = new Table(); // Tworzymy tabelę
+        Table table = new Table();
         table.center();
         table.setFillParent(true);
 
-        // Dodaj przyciski i etykietę do tabeli
-        table.add(optionsLabel).padBottom(50).colspan(2);
-        table.row().padBottom(20);
-        table.add(soundSettingsButton).fillX().uniformX().padBottom(20);
-        table.row().pad(10, 0, 10, 0);
-        table.add(controlsButton).fillX().uniformX().padBottom(20);
-        table.row().pad(10, 0, 10, 0);
-        table.add(backToMenuButton).fillX().uniformX();
+        table.add(volumeButton).padBottom(10).center();
+        table.row();
+        table.add(controlButton).padBottom(10).center();
+        table.row();
+        table.add(menuButton).center();
 
-        // Dodaj tabelę do sceny
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
         stage.addActor(table);
+
+        table.setPosition(-SCREEN_WIDTH, table.getY());
+        table.addAction(Actions.moveTo(0, table.getY(), ANIMATION_DURATION));
     }
+
+    private void animateButtonsOffScreen(Runnable onComplete) {
+        float screenWidth = Gdx.graphics.getWidth();
+
+        for (Actor actor : stage.getActors()) {
+            if (actor instanceof Table) {
+                Table table = (Table) actor;
+                for (Cell<?> cell : table.getCells()) {
+                    Actor button = cell.getActor();
+                    if (button != null) {
+                        button.addAction(Actions.moveTo(screenWidth + button.getWidth(), button.getY(), ANIMATION_DURATION));
+                    }
+                }
+                table.addAction(Actions.sequence(
+                        Actions.delay(ANIMATION_DURATION),
+                        Actions.run(onComplete)
+                ));
+            }
+        }
+    }
+
+
 
     @Override
     public void render(float delta) {
-        // Rysowanie tła i interfejsu
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Oblicz proporcje tła i dopasuj je do ekranu
         float screenWidth = Gdx.graphics.getWidth();
         float screenHeight = Gdx.graphics.getHeight();
-        float textureWidth = backgroundTexture.getWidth();
-        float textureHeight = backgroundTexture.getHeight();
-
-        // Zachowanie proporcji obrazu tła
-        float scaleX = screenWidth / textureWidth;
-        float scaleY = screenHeight / textureHeight;
-        float scale = Math.max(scaleX, scaleY); // Użyj większego skalowania, aby pasować do ekranu
-
-        // Oblicz nowe wymiary tła
-        float newWidth = textureWidth * scale;
-        float newHeight = textureHeight * scale;
-
-        // Oblicz pozycję tła, aby wyśrodkować je na ekranie
-        float x = (screenWidth - newWidth) / 2;
-        float y = (screenHeight - newHeight) / 2;
 
         batch.begin();
-        batch.draw(backgroundTexture, x, y, newWidth, newHeight);  // Rysuj tło
+        batch.draw(backgroundTexture, 0, 0, screenWidth, screenHeight); // Dynamiczne dopasowanie tła
         batch.end();
 
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-        stage.draw();
+        if (stage != null) { // Dodajemy sprawdzenie istnienia stage
+            stage.act(delta);
+            stage.draw();
+        }
     }
+
     @Override
     public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
+        if (stage != null) {
+            stage.getViewport().update(width, height, true);
+        }
     }
+
+    @Override
+    public void pause() {}
+
+    @Override
+    public void resume() {}
 
     @Override
     public void hide() {
-        // Zwalniamy zasoby
-        stage.dispose();
-        batch.dispose();  // Zwalniamy SpriteBatch
-        backgroundTexture.dispose();
-        backgroundMusic.dispose();
+        if (stage != null) {
+            stage.dispose(); // Usuwamy zasoby, ale nie ustawiamy stage na null
+        }
     }
-
     @Override
     public void dispose() {
+        if (stage != null) {
+            stage.dispose();
+        }
+        if (batch != null) {
+            batch.dispose();
+        }
+        if (backgroundTexture != null) {
+            backgroundTexture.dispose();
+        }
     }
 
-    @Override
-    public void pause() {
-    }
-
-    @Override
-    public void resume() {
-    }
 }
