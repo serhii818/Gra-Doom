@@ -36,7 +36,7 @@ public class OptionsScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         batch = new SpriteBatch();
-        backgroundTexture = new Texture(Gdx.files.internal("doommenu.jpg"));
+        backgroundTexture = new Texture(Gdx.files.internal("Menu/doommenu.jpg"));
 
         MusicManager.getInstance().playMusic();
 

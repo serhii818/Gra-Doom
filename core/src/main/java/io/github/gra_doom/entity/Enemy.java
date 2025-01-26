@@ -14,7 +14,7 @@ public class Enemy extends Character{
     private float visionDist = 6*6;
     private float shootDist = 4*4;
     private float stopDist = 3*3;
-
+    private boolean deadCounted = false;
 
 
     public Enemy() {
@@ -95,4 +95,13 @@ public class Enemy extends Character{
     public String toString() {
         return "Enemy:" + super.toString();
     }
+
+    public boolean isDeadCounted() {
+        return deadCounted;
+    }
+
+    public void setDeadCounted(boolean deadCounted) {
+        this.deadCounted = deadCounted;
+    }
+
 }

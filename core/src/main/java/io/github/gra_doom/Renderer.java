@@ -18,7 +18,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  *     or none
  * </li>
  */
-abstract public class Renderer  implements Disposable {
+abstract public class   Renderer  implements Disposable {
     public enum DrawMode {
         FULL_WINDOW,
         CORNER_UL,

@@ -31,8 +31,10 @@ public class MenuScreen implements Screen {
         try {
             initializeViewport();
 
-            // Odtwórz muzykę
-            MusicManager.getInstance().playMusic();
+            MusicManager manager = MusicManager.getInstance();
+            manager.setMusic("sound_and_music/menu.mp3", true);
+            manager.playMusic();
+
 
             // Zainicjalizuj batch (ponowne załadowanie w przypadku null)
             if (batch == null) {
@@ -51,7 +53,7 @@ public class MenuScreen implements Screen {
         stage = new Stage(new FitViewport(MENU_WIDTH, MENU_HEIGHT));
         Gdx.input.setInputProcessor(stage);
 
-        backgroundTexture = new Texture(Gdx.files.internal("doommenu.jpg"));
+        backgroundTexture = new Texture(Gdx.files.internal("Menu/doommenu.jpg"));
         batch = new SpriteBatch();
     }
 
@@ -71,12 +73,23 @@ public class MenuScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 animateButtonsOffScreen(() -> {
+
+                    MusicManager.getInstance().stopMusic();
+
                     // Przełącz na OptionsScreen po animacji
+
+                    MusicManager.getInstance().stopMusic();
+
+// Ustawiamy ścieżkę do game.mp3
+                    MusicManager.getInstance().setMusic("sound_and_music/game.mp3", true);
+                    MusicManager.getInstance().playMusic();
+
+// Teraz przechodzimy do ekranu gry
                     Main game = ((Main) Gdx.app.getApplicationListener());
-                    game.setScreen(game.gameScreen);
+                    game.resetGame();
                     game.inMenu = false;
+                    game.setScreen(game.gameScreen);
                     Gdx.input.setInputProcessor(game.keyboardController);
-                    System.out.println("Should play game");
                 });
                 return true;
             }

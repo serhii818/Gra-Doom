@@ -33,6 +33,9 @@ public class DebugOverlay extends Renderer{
         messageCounter = 0;
         batch.end();
         drawFrame();
+
+        
+
     }
 
     @Override

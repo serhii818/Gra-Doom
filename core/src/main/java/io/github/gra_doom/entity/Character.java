@@ -29,6 +29,10 @@ abstract public class Character extends MoveableEntity implements Killable{
         shooting = false;
     }
 
+    public Vector2 getPosition() {
+        return pos; // pos jest polem z MoveableEntity
+    }
+
     @Override
     public void update(Map map, float frameTime) {
         super.update(map, frameTime);

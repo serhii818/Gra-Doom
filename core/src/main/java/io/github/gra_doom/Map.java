@@ -1,6 +1,8 @@
 package io.github.gra_doom;
 
+import com.badlogic.gdx.Gdx;
 import io.github.gra_doom.entity.Entity;
+import io.github.gra_doom.entity.Enemy;
 import io.github.gra_doom.entity.PickUpItem;
 
 import java.io.*;
@@ -14,6 +16,10 @@ public class Map implements Serializable {
     public LinkedList<Entity> entities;
     private LinkedList<Entity> new_entities;
     private long lastFrameTime;
+    private int totalScore = 0;
+
+    private int[][] tileData;
+
 
     public Map(int[][] arr, Player player) {
         this.arr = arr;
@@ -22,7 +28,12 @@ public class Map implements Serializable {
         entities = new LinkedList<>();
         new_entities = new LinkedList<>();
 
+
+
     }
+
+
+
 
     public int getArr(int x, int y) {
         return arr[x][y];
@@ -40,12 +51,32 @@ public class Map implements Serializable {
     public void update() {
         entities.addAll(new_entities);
         new_entities.clear();
+
+
         long currentTime = System.nanoTime();
         // delta time for stable movement for different fps
         float frameTime = (currentTime - lastFrameTime) / 1000000000.0f;
         lastFrameTime = currentTime;
 
         player.update(this, frameTime);
+
+        for (Entity e : entities) {
+            e.update(this, Gdx.graphics.getDeltaTime());
+        }
+
+        for (Entity e : entities) {
+            if (e instanceof Enemy) {
+                Enemy enemy = (Enemy) e;
+
+                if (!enemy.isDeadCounted() && enemy.getHealth() <= 0) {
+                    addScore(30);
+                    enemy.setDeadCounted(true);
+                }
+            }
+        }
+
+
+
 
         Iterator<Entity> iterator = entities.iterator();
         while(iterator.hasNext()) {
@@ -92,5 +123,36 @@ public class Map implements Serializable {
         }
 
         return map;
+    }
+
+    public int[][] getTileData() {
+        return this.tileData; // lub jak nazywasz swoją tablicę reprezentującą mapę
+    }
+
+    // Pobieranie wyniku
+    public int getTotalScore() {
+        return totalScore;
+    }
+
+    // Ewentualnie dodaj prostą metodę na zwiększenie wyniku:
+    public void addScore(int points) {
+        totalScore += points;
+    }
+
+
+    public int getEnemyCount() {
+        int count = 0;
+        for (Entity e : entities) {
+            // Sprawdzamy, czy obiekt to Enemy i czy jeszcze żyje (Health > 0)
+            if (e instanceof Enemy) {
+                Enemy enemy = (Enemy) e;
+                // Jeżeli w Twoim kodzie "Character" ma logikę health <= 0 => martwy,
+                // wtedy sprawdź, czy enemy jest wciąż "żywy"
+                if (enemy.getHealth() > 0) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 }
