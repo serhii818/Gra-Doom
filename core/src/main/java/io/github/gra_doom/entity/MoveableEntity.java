@@ -6,31 +6,29 @@ import io.github.gra_doom.Map;
 
 abstract public class MoveableEntity extends Entity {
 
+
+
     // must always be normalized (must have lenght 1)
     public Vector2 vel;
     public Vector2 oldPos;
-
-    private long lastFrameTime;
-
-    private float speed;
+    protected float speed;
 
     public MoveableEntity() {
         super();
         vel = new Vector2(0, 0);
         oldPos = new Vector2(0, 0);
+        this.speed = 1;
     }
 
-    public MoveableEntity( Vector2 pos,  float size, Pixmap sprite) {
-        super(pos, size, sprite);
+    public MoveableEntity( Vector2 pos,  float size, String spritePath, float speed) {
+        super(pos, size, spritePath);
         vel = new Vector2(0, 0);
         oldPos = new Vector2(0, 0);
+        this.speed = speed;
     }
 
-    public void update(Map map) {
-        long currentTime = System.nanoTime();
-        // delta time for stable movement for different fps
-        float frameTime = (currentTime - lastFrameTime) / 1000000000.0f;
-        lastFrameTime = currentTime;
+    @Override
+    public void update(Map map, float frameTime) {
 
         // save old position to move back in case of collision
         oldPos.set(pos);
@@ -41,7 +39,47 @@ abstract public class MoveableEntity extends Entity {
         pos.y += vel.y * speed * frameTime;
         if (isInWall(map)) pos.y = oldPos.y;
 
-        // TODO check for any entity collision
+        for (Entity e : map.entities) {
+            collide(e);
+        }
     }
 
+    @Override
+    public void collide(Entity e) {
+        if (e != this && !((e instanceof PickUpItem) || e instanceof Projectile)) {
+            if (isColliding(this, e)) {
+                float x = pos.x;
+                pos.x = oldPos.x;
+                if (isColliding(this, e)) {
+                    pos.x = x;
+                    pos.y = oldPos.y;
+                    if (isColliding(this, e)) {
+                        pos.x = oldPos.x;
+                    }
+                }
+
+            }
+        }
+    }
+
+    public void setVel(Vector2 vel) {
+        this.vel.set(vel);
+        this.vel.setLength(1);
+    }
+
+    public void setVel(float x, float y) {
+        this.vel.x = x;
+        this.vel.y = y;
+        this.vel.setLength(1);
+    }
+
+
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
 }

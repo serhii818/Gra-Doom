@@ -1,12 +1,15 @@
 package io.github.gra_doom;
 
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import io.github.gra_doom.entity.*;
 
 public class Main extends ApplicationAdapter {
     Map selectedMap;
@@ -14,6 +17,7 @@ public class Main extends ApplicationAdapter {
     // test data section
     Renderer dr;
     Renderer rc;
+    Renderer dov;
     // -----------------
 
     Player cam;
@@ -25,8 +29,8 @@ public class Main extends ApplicationAdapter {
      */
     @Override
     public void create() {
-        // test
-        // preparing window renderers, Game camera and map
+
+        // preparing window renderers
         Texture[] textures = new Texture[8];
         String[] texture_path = {
             "eagle",
@@ -40,7 +44,6 @@ public class Main extends ApplicationAdapter {
         };
         for (int i = 0; i < texture_path.length; i++) {
             textures[i] = new Texture(Gdx.files.internal("pics/" + texture_path[i] + ".png"));
-
         }
         //Wybieramy wielkosc mapy ( wpisanie wymiaru o wartosci 0 powoduje wczytanie mapy z pliku)
         int mapWidth = 0;
@@ -55,8 +58,12 @@ public class Main extends ApplicationAdapter {
         dr = new DebugRenderer(35, selectedMap.arr[0].length * 35, selectedMap.arr.length * 35, textures, cam);
         //dr = new DebugRenderer(20, 800, 400, textures, cam);
         rc = new RayCaster(800, 600, textures);
+
         dr.setMode(Renderer.DrawMode.FULL_WINDOW);
+        dov = new DebugOverlay(1600, 800);
+        dr.setMode(Renderer.DrawMode.CORNER_UL);
         rc.setMode(Renderer.DrawMode.FULL_WINDOW);
+        dov.setMode(Renderer.DrawMode.FULL_WINDOW);
         ((RayCaster)rc).setDrawFloorEnabled(false);
 
         
@@ -72,6 +79,38 @@ public class Main extends ApplicationAdapter {
         Gdx.input.setInputProcessor(MapEditorController);
         
         // ----
+        // preparing player
+        cam = Player.makePlayer();
+        cam.applyDamage(40);
+        Projectile p = new Projectile(new Vector2(0, 0), 0.5f, "bullet/b2.png", 5,25, true);
+        p.setTransforms(3, 3, 0);
+        Weapon pw = new ProjectileWeapon(10, AmmoType.PISTOL, p);
+        //Weapon pw = new HitScanWeapon(30, AmmoType.PISTOL, 25);
+        cam.setWeapon(pw);
+
+
+        selectedMap = new Map(arr, cam);
+
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.IMP, new Vector2(2, 2)));
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.IMP, new Vector2(20, 20)));
+
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(10, 10)));
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(11, 11)));
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(12, 10)));
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(10, 20)));
+
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.DEMON, new Vector2(18, 21)));
+
+        selectedMap.addEntity(PickUpItem.makeItem(new Vector2(2, 3), PickUpItem.Item.HEALTH25));
+        selectedMap.addEntity(PickUpItem.makeItem(new Vector2(20, 21), PickUpItem.Item.HEALTH25));
+        selectedMap.addEntity(PickUpItem.makeItem(new Vector2(10, 21), PickUpItem.Item.HEALTH50));
+        selectedMap.addEntity(PickUpItem.makeItem(new Vector2(20, 11), PickUpItem.Item.HEALTH100));
+
+        keyboardController = new KeyboardController(selectedMap.getPlayer(), selectedMap);
+        Gdx.input.setInputProcessor(keyboardController);
+
+
+
     }
 
     /**
@@ -84,6 +123,7 @@ public class Main extends ApplicationAdapter {
         super.resize(width, height);
         rc.viewport.update(width, height, true);
         dr.viewport.update(width, height, true);
+        dov.viewport.update(width, height, true);
     }
 
     /**
@@ -103,6 +143,11 @@ public class Main extends ApplicationAdapter {
 
         //rc.render(selectedMap);
         dr.render(selectedMap);
+
+        rc.render(selectedMap);
+        //dr.render(selectedMap);
+        dov.render(selectedMap);
+
     }
 
     /**

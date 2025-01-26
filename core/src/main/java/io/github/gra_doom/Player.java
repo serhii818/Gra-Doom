@@ -2,15 +2,12 @@ package io.github.gra_doom;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.*;
+import io.github.gra_doom.entity.*;
 import io.github.gra_doom.entity.Character;
-import io.github.gra_doom.entity.Killable;
-import io.github.gra_doom.entity.MoveableEntity;
 
 public class Player extends Character {
 
-
-    Vector2 dir;
-    Vector2 plane;
+    public Vector2 plane;
 
     public boolean rotatingRight, rotatingLeft;
     public boolean movingForward, movingBackward, movingRight, movingLeft;
@@ -23,8 +20,8 @@ public class Player extends Character {
     private float frameTime;
 
 
-    public Player(Vector2 pos, Vector2 dir, Vector2 plane, float size, Pixmap sprite, float maxHealth) {
-        super(pos, size, sprite, maxHealth);
+    public Player(Vector2 pos, Vector2 dir, Vector2 plane, float size, String spritePath, float maxHealth) {
+        super(pos, size, spritePath, 0, maxHealth);
         this.dir = dir;
         this.plane = plane;
 
@@ -32,16 +29,11 @@ public class Player extends Character {
 
     public static Player makePlayer() {
         return new Player(new Vector2(14.4f, 10.8f), new Vector2(-1, 0),
-            new Vector2(0, 0.66f), 0.5f, new Pixmap(1, 1, Pixmap.Format.RGBA8888), 100);
+            new Vector2(0, 0.66f), 0.5f, "", 100);
     }
 
     @Override
-    public void update(Map map) {
-        long currentTime = System.nanoTime();
-        frameTime = (currentTime - lastFrameTime) / 1000000000.0f;
-        lastFrameTime = currentTime;
-
-
+    public void update(Map map, float frameTime) {
     	float movingAmount = movingSpeed * frameTime;
     	float rotateAmount = rotationSpeed * frameTime;
 
@@ -70,7 +62,7 @@ public class Player extends Character {
             if (isInWall(map)) pos.y = oldPos.y;
     	}
 
-        oldPos.set(pos);
+        //oldPos.set(pos);
     	if (movingRight) {
     	    pos.x += dir.y * movingAmount/2;
             if (isInWall(map)) pos.x = oldPos.x;
@@ -87,12 +79,40 @@ public class Player extends Character {
     	}
     	
     	
+
+        for (Entity e : map.entities) {
+            collide(e);
+        }
+        if (hasWeapon()) weapon.updateFrameCount();
+        if (isShooting()) shoot(map);
+
     }
 
     @Override
-    public void collide() {
+    public void collide(Entity e) {
+        if (!(e instanceof Projectile)) {
+            if (e instanceof PickUpItem p) {
+                if (isColliding(this, p)) {
+                    p.pick(this);
+                    p.selfDestroy();
+                }
+            }
+            else {
+                if (isColliding(this, e)) {
+                    float x = pos.x;
+                    pos.x = oldPos.x;
+                    if (isColliding(this, e)) {
+                        pos.x = x;
+                        pos.y = oldPos.y;
+                        if (isColliding(this, e)) {
+                            pos.x = oldPos.x;
+                        }
+                    }
+
+                }
+            }
+        }
 
     }
-
 
 }

@@ -5,7 +5,11 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import io.github.gra_doom.entity.Entity;
+
+import java.util.Arrays;
 
 /**
  * renderer map of the screen
@@ -19,6 +23,10 @@ public class RayCaster extends Renderer implements Disposable {
     Pixmap buffer;
     Pixmap floorTex;
     Pixmap ceilingTex;
+    float[] zBuffer;
+    Integer[] spriteOrder;
+    Float[] spriteDist;
+    static public int maxSprites = 100;
 
     private boolean drawFloorEnabled;
 
@@ -39,6 +47,9 @@ public class RayCaster extends Renderer implements Disposable {
         this.ceilingTex = this.textures[7];
 
         buffer = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        zBuffer = new float[width];
+        spriteDist = new Float[maxSprites];
+        spriteOrder = new Integer[maxSprites];
 
         setDrawFloorEnabled(true);
     }
@@ -48,14 +59,13 @@ public class RayCaster extends Renderer implements Disposable {
         buffer.setColor(Color.BLACK);
         buffer.fill();
 
-
-
-
         // floor casting
         drawFloor(cam);
 
         // wall casting
         drawWalls(cam, map);
+
+        drawSprites(map);
     }
 
     private void drawFloor(Player cam) {
@@ -106,11 +116,107 @@ public class RayCaster extends Renderer implements Disposable {
         }
     }
 
+    private void drawSprites(Map map) {
+        int spriteNum = map.entities.size();
+
+        //sort sprites
+        for (int i = 0; i< spriteNum; i++) {
+            spriteOrder[i] = i;
+            spriteDist[i] = map.entities.get(i).getDistFromCam(map.getPlayer());
+        }
+        sortSprites(spriteNum);
+
+        for (int i = 0; i< spriteNum; i++) {
+            Player cam = map.getPlayer();
+            Entity e = map.entities.get(spriteOrder[i]);
+
+            int texWidth = e.sprite.getWidth();
+            int texHeight = e.sprite.getHeight();
+
+            double spriteX = e.pos.x - cam.pos.x;
+            double spriteY = e.pos.y - cam.pos.y;
+            double invDet = 1.0 / (cam.plane.x * cam.dir.y - cam.dir.x * cam.plane.y);
+            double transformX = invDet * (cam.dir.y * spriteX - cam.dir.x * spriteY);
+            double transformY = invDet * (-cam.plane.y * spriteX + cam.plane.x * spriteY);
+
+            int spriteScreenX = (int) ((width / 2) * (1 + transformX / transformY));
+            int vMoveScreen = (int)(e.vMove / transformY);
+            // ************************************************
+            int spriteHeight = (int) (Math.abs((int)(height / (transformY))) / e.vDiv);
+
+            int drawStartY = -spriteHeight / 2 + height / 2 + vMoveScreen;
+            if(drawStartY < 0) drawStartY = 0;
+
+            int drawEndY = spriteHeight / 2 + height / 2 + vMoveScreen;
+            if(drawEndY >= height) drawEndY = height - 1;
+            // ************************************************
+            int spriteWidth = (int)(Math.abs( (int) (height / (transformY))) / (e.uDiv*(float)(texHeight)/texWidth));
+
+            int drawStartX = -spriteWidth / 2 + spriteScreenX;
+            if(drawStartX < 0) drawStartX = 0;
+
+            int drawEndX = spriteWidth / 2 + spriteScreenX;
+            if(drawEndX >= width) drawEndX = width - 1;
+            // ************************************************
+
+            float health_p = 0;
+            if (e instanceof io.github.gra_doom.entity.Character c) {
+                health_p = c.getHealth() / c.getMaxHealth();
+            }
+
+            for(int stripe = drawStartX; stripe < drawEndX; stripe++) {
+                int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
+                //the conditions in the if are:
+                //1) it's in front of camera plane so you don't see things behind you
+                //2) it's on the screen (left)
+                //3) it's on the screen (right)
+                //4) ZBuffer, with perpendicular distance
+                if(transformY > 0 && stripe > 0 && stripe < width && transformY < zBuffer[stripe])
+                    for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+                    {
+                        int d = (y-vMoveScreen) * 256 - height * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
+                        int texY = ((d * texHeight) / spriteHeight) / 256;
+                        int color;
+                        if (y > drawStartY+5 || health_p == 0) {
+                            color = e.sprite.getPixel(texX, texY);
+                        } else {
+                            if (((float)texX / texWidth) < health_p) color = Color.rgba8888(0, 1, 0, 1);
+                            else color = Color.rgba8888(1, 0, 0, 1);
+
+                        }
+
+                        if ((color & 0xFFFFFF00) != 0) buffer.drawPixel(stripe, y, color);
+                    }
+            }
+        }
+
+    }
+
+    private void sortSprites(int spriteNum) {
+        // sorts sprite order according to sprite distance
+        Arrays.sort(spriteOrder, 0, spriteNum, (i1, i2) -> Float.compare(spriteDist[i1], spriteDist[i2]));
+
+        // revers to get from furthest to the closest
+        for (int i = 0; i < spriteNum/2; i++) {
+            Integer temp = spriteOrder[i];
+            spriteOrder[i] = spriteOrder[spriteNum-i-1];
+            spriteOrder[spriteNum-i-1] = temp;
+        }
+
+        // sort distances using sorted spriteOrder
+        Float[] sortedSpriteDist = new Float[spriteNum];
+        for (int i = 0; i < sortedSpriteDist.length; i++) {
+            sortedSpriteDist[i] = spriteDist[spriteOrder[i]];
+        }
+        System.arraycopy(sortedSpriteDist, 0, spriteDist, 0, sortedSpriteDist.length);
+    }
+
     public void setDrawFloorEnabled(boolean drawFloorEnabled) {
         this.drawFloorEnabled = drawFloorEnabled;
     }
 
     private void drawWalls(Player cam, Map map) {
+
         for (int x = 0; x < width; x++) {
             float cameraX = 2*x / (float)width -1;              // direction of ray relative to the center of screen (-1; 1)
             float rayDirX = cam.dir.x + cam.plane.x* cameraX;
@@ -214,6 +320,7 @@ public class RayCaster extends Renderer implements Disposable {
                     buffer.drawPixel(x, y, color);
 
                 }
+                zBuffer[x] = perpWallDist;
             }
         }
     }
@@ -236,7 +343,6 @@ public class RayCaster extends Renderer implements Disposable {
         if (drawMode!=DrawMode.NONE) {
             frame = new Texture(buffer);
             TextureRegion frameT = new TextureRegion(frame);
-            System.out.println(frameT.getTexture().getWidth());
             batch.begin();
             //frameT.flip(false, true);
             batch.draw(

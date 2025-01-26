@@ -1,26 +1,41 @@
 package io.github.gra_doom.entity;
 
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.Vector2;
+import io.github.gra_doom.Map;
 
 abstract public class Character extends MoveableEntity implements Killable{
     float health;
     float maxHealth;
-    boolean avile;
+    boolean alive;
+    protected Weapon weapon;
+    public Vector2 dir;
+    protected boolean shooting;
 
     public Character() {
         super();
         health = 100;
         maxHealth = 100;
-        avile = true;
+        alive = true;
+        this.dir = new Vector2(0, 0);
+        shooting = false;
     }
 
-    public Character(Vector2 pos, float size, Pixmap sprite, float maxHealth) {
-        super(pos, size, sprite);
+    public Character(Vector2 pos, float size, String spritePath, float speed, float maxHealth) {
+        super(pos, size, spritePath, speed);
         this.maxHealth = maxHealth;
         this.health = maxHealth;
-        this.avile = true;
+        this.alive = true;
+        this.dir = new Vector2(0, 0);
+        shooting = false;
     }
+
+    @Override
+    public void update(Map map, float frameTime) {
+        super.update(map, frameTime);
+        if (!alive) selfDestroy();
+        if (hasWeapon()) weapon.updateFrameCount();
+    }
+
 
     @Override
     public void applyDamage(float damage) {
@@ -64,13 +79,39 @@ abstract public class Character extends MoveableEntity implements Killable{
 
     @Override
     public void updateLifeState() {
-        if (getHealth() <= 0) avile = false;
-        else avile = true;
+        if (getHealth() <= 0) alive = false;
+        else alive = true;
         if (health > maxHealth) health = maxHealth;
     }
 
     @Override
     public boolean isAlive() {
-        return avile;
+        return alive;
+    }
+
+    public void shoot(Map map) {
+        Vector2 proj_pos = pos.cpy();
+        proj_pos.add(dir);
+        if (weapon != null) weapon.shoot(proj_pos, dir.cpy(), map);
+    }
+
+    public void setWeapon(Weapon weapon) {
+        this.weapon = weapon;
+    }
+
+    public Weapon getWeapon() {
+        return weapon;
+    }
+
+    public boolean hasWeapon() {
+        return weapon != null;
+    }
+
+    public boolean isShooting() {
+        return shooting;
+    }
+
+    public void setShooting(boolean shooting) {
+        this.shooting = shooting;
     }
 }
