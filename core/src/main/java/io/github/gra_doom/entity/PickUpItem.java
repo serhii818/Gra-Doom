@@ -26,7 +26,28 @@ public class PickUpItem extends Entity{
     public PickUpItem(Vector2 pos, float size, String spritePath, Item item) {
         super(pos, size, spritePath);
         this.item = item;
-        System.out.println("Im a pickupItem");
+    }
+
+    public static PickUpItem makeItem(Vector2 pos, Item item) {
+        PickUpItem pi;
+
+        switch (item) {
+            case Item.HEALTH25:
+                pi = new PickUpItem(pos, 0.5f, "picks/heal1.png", item);
+                break;
+            case Item.HEALTH50:
+                pi = new PickUpItem(pos, 0.5f, "picks/heal2.png", item);
+                break;
+            case Item.HEALTH100:
+                pi = new PickUpItem(pos, 0.5f, "picks/heal3.png", item);
+                break;
+            default:
+                pi = new PickUpItem(pos, 0.5f, "picks/heal3.png", item);
+                break;
+        }
+
+        return pi;
+
     }
 
     @Override

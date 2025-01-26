@@ -82,6 +82,4 @@ abstract public class MoveableEntity extends Entity {
     public void setSpeed(float speed) {
         this.speed = speed;
     }
-
-    // TODO add methods for controling movement like: setVelosity, stop, etc
 }

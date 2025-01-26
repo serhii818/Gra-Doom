@@ -32,6 +32,9 @@ public class Projectile extends MoveableEntity{
         this.shouldDelete = other.shouldDelete;
         this.spritePath = other.spritePath;
         this.initializeSprite();
+        this.uDiv = other.uDiv;
+        this.vDiv = other.vDiv;
+        this.vMove = other.vMove;
     }
 
 

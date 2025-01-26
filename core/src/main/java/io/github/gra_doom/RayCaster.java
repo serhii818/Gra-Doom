@@ -130,6 +130,9 @@ public class RayCaster extends Renderer implements Disposable {
             Player cam = map.getPlayer();
             Entity e = map.entities.get(spriteOrder[i]);
 
+            int texWidth = e.sprite.getWidth();
+            int texHeight = e.sprite.getHeight();
+
             double spriteX = e.pos.x - cam.pos.x;
             double spriteY = e.pos.y - cam.pos.y;
             double invDet = 1.0 / (cam.plane.x * cam.dir.y - cam.dir.x * cam.plane.y);
@@ -137,21 +140,25 @@ public class RayCaster extends Renderer implements Disposable {
             double transformY = invDet * (-cam.plane.y * spriteX + cam.plane.x * spriteY);
 
             int spriteScreenX = (int) ((width / 2) * (1 + transformX / transformY));
-            int spriteHeight = Math.abs((int)(height / (transformY)));
-            int drawStartY = -spriteHeight / 2 + height / 2;
+            int vMoveScreen = (int)(e.vMove / transformY);
+            // ************************************************
+            int spriteHeight = (int) (Math.abs((int)(height / (transformY))) / e.vDiv);
 
+            int drawStartY = -spriteHeight / 2 + height / 2 + vMoveScreen;
             if(drawStartY < 0) drawStartY = 0;
-            int drawEndY = spriteHeight / 2 + height / 2;
+
+            int drawEndY = spriteHeight / 2 + height / 2 + vMoveScreen;
             if(drawEndY >= height) drawEndY = height - 1;
-            int spriteWidth = Math.abs( (int) (height / (transformY)));
+            // ************************************************
+            int spriteWidth = (int)(Math.abs( (int) (height / (transformY))) / (e.uDiv*(float)(texHeight)/texWidth));
 
             int drawStartX = -spriteWidth / 2 + spriteScreenX;
             if(drawStartX < 0) drawStartX = 0;
+
             int drawEndX = spriteWidth / 2 + spriteScreenX;
             if(drawEndX >= width) drawEndX = width - 1;
+            // ************************************************
 
-            int texWidth = e.sprite.getWidth();
-            int texHeight = e.sprite.getHeight();
             float health_p = 0;
             if (e instanceof io.github.gra_doom.entity.Character c) {
                 health_p = c.getHealth() / c.getMaxHealth();
@@ -167,7 +174,7 @@ public class RayCaster extends Renderer implements Disposable {
                 if(transformY > 0 && stripe > 0 && stripe < width && transformY < zBuffer[stripe])
                     for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
                     {
-                        int d = (y) * 256 - height * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
+                        int d = (y-vMoveScreen) * 256 - height * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
                         int texY = ((d * texHeight) / spriteHeight) / 256;
                         int color;
                         if (y > drawStartY+5 || health_p == 0) {

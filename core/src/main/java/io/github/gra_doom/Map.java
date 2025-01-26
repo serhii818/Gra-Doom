@@ -12,6 +12,7 @@ public class Map implements Serializable {
     Player player;
     static final String savePath = "Maps/";
     public LinkedList<Entity> entities;
+    private LinkedList<Entity> new_entities;
     private long lastFrameTime;
 
     public Map(int[][] arr, Player player) {
@@ -19,6 +20,7 @@ public class Map implements Serializable {
         this.player = player;
 
         entities = new LinkedList<>();
+        new_entities = new LinkedList<>();
 
     }
 
@@ -31,11 +33,13 @@ public class Map implements Serializable {
     }
 
     public void addEntity(Entity e) {
-        entities.add(e);
+        new_entities.add(e);
     }
 
 
     public void update() {
+        entities.addAll(new_entities);
+        new_entities.clear();
         long currentTime = System.nanoTime();
         // delta time for stable movement for different fps
         float frameTime = (currentTime - lastFrameTime) / 1000000000.0f;
@@ -52,6 +56,7 @@ public class Map implements Serializable {
                 iterator.remove();
             }
         }
+
     }
 
     public static void saveToFile(Map map ,String fileName) {

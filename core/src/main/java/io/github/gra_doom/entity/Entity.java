@@ -21,6 +21,11 @@ abstract public class Entity implements Serializable {
 
     public boolean shouldDelete; // is set to true on next iteration in update method of Map object will be deleted from array
 
+    // transforms for rendering
+    public float uDiv = 1.0f;
+    public float vDiv = 1.0f;
+    public float vMove = 0.0f;
+
     /**
      * Default constructor, created entity at (0, 0) of size 1, with no sprite
      */
@@ -39,7 +44,7 @@ abstract public class Entity implements Serializable {
      * @param spritePath path for sprite, use initializeSprite to update sprite Pixmap
      */
     public Entity( Vector2 pos,  float size, String spritePath) {
-        this.pos = pos;
+        this.pos = pos.cpy();
         this.size = size;
         this.spritePath = spritePath;
         initializeSprite();
@@ -57,15 +62,30 @@ abstract public class Entity implements Serializable {
 
     }
 
+    public boolean isInBound(Map map, Entity e) {
+
+        return 0 <= (int) (pos.y - size / 2) && (int) (pos.y - size / 2) <= map.arr.length &&
+            0 <= (int) (pos.y + size / 2) && (int) (pos.y + size / 2) <= map.arr.length &&
+            0 <= (int) (pos.x - size / 2) && (int) (pos.x - size / 2) <= map.arr.length &&
+            0 <= (int) (pos.x + size / 2) && (int) (pos.x + size / 2) <= map.arr.length;
+    }
+
     /**
      * Tells if the Entity inside the wall
      * @param map map that object is inside of
      */
     public boolean isInWall(Map map) {
-        return map.arr[(int) (pos.y - size/2)][(int) (pos.x - size/2)] != 0 ||
-            map.arr[(int) (pos.y - size/2)][(int) (pos.x + size/2)] != 0 ||
-            map.arr[(int) (pos.y + size/2)][(int) (pos.x - size/2)] != 0 ||
-            map.arr[(int) (pos.y + size/2)][(int) (pos.x + size/2)] != 0;
+
+        boolean inBound = isInBound(map, this);
+
+        if (inBound) {
+            return map.arr[(int) (pos.y - size / 2)][(int) (pos.x - size / 2)] != 0 ||
+                map.arr[(int) (pos.y - size / 2)][(int) (pos.x + size / 2)] != 0 ||
+                map.arr[(int) (pos.y + size / 2)][(int) (pos.x - size / 2)] != 0 ||
+                map.arr[(int) (pos.y + size / 2)][(int) (pos.x + size / 2)] != 0;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -118,5 +138,11 @@ abstract public class Entity implements Serializable {
     public void setPos(float x, float y) {
         this.pos.x = x;
         this.pos.y = y;
+    }
+
+    public void setTransforms(float uDiv, float vDiv, float vMove) {
+        this.uDiv = uDiv;
+        this.vDiv = vDiv;
+        this.vMove = vMove;
     }
 }

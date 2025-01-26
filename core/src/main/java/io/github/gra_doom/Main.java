@@ -1,10 +1,5 @@
 package io.github.gra_doom;
 
-/*
-* TODO write player pickup item
-* TODO Weapoon
-* TODO hitscan weapon
-*/
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -60,9 +55,10 @@ public class Main extends ApplicationAdapter {
         // preparing player
         cam = Player.makePlayer();
         cam.applyDamage(40);
-        //Projectile p = new Projectile(new Vector2(0, 0), 0.5f, "pics/barrel.png", 2,25, true);
-        //Weapon pw = new ProjectileWeapon(20, AmmoType.PISTOL, p);
-        Weapon pw = new HitScanWeapon(30, AmmoType.PISTOL, 25);
+        Projectile p = new Projectile(new Vector2(0, 0), 0.5f, "bullet/b2.png", 5,25, true);
+        p.setTransforms(3, 3, 0);
+        Weapon pw = new ProjectileWeapon(10, AmmoType.PISTOL, p);
+        //Weapon pw = new HitScanWeapon(30, AmmoType.PISTOL, 25);
         cam.setWeapon(pw);
 
         // prepare map
@@ -93,12 +89,21 @@ public class Main extends ApplicationAdapter {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
         };
         selectedMap = new Map(arr, cam);
-        selectedMap.addEntity(new Enemy(new Vector2(2f, 2f), 0.5f, "pics/barrel.png", 1, 100));
-        selectedMap.addEntity(new Enemy(new Vector2(5f, 5f), 0.5f, "pics/barrel.png", 1, 100));
-        selectedMap.addEntity(new Enemy(new Vector2(2f, 5f), 0.5f, "pics/barrel.png", 1, 100));
-        selectedMap.addEntity(new Enemy(new Vector2(12f, 5f), 0.5f, "pics/barrel.png", 1, 100));
-        selectedMap.addEntity(new PickUpItem(new Vector2(12f, 5f), 0.5f, "pics/barrel.png", PickUpItem.Item.HEALTH25));
-        System.out.println(selectedMap.entities.size());
+
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.IMP, new Vector2(2, 2)));
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.IMP, new Vector2(20, 20)));
+
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(10, 10)));
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(11, 11)));
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(12, 10)));
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(10, 20)));
+
+        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.DEMON, new Vector2(18, 21)));
+
+        selectedMap.addEntity(PickUpItem.makeItem(new Vector2(2, 3), PickUpItem.Item.HEALTH25));
+        selectedMap.addEntity(PickUpItem.makeItem(new Vector2(20, 21), PickUpItem.Item.HEALTH25));
+        selectedMap.addEntity(PickUpItem.makeItem(new Vector2(10, 21), PickUpItem.Item.HEALTH50));
+        selectedMap.addEntity(PickUpItem.makeItem(new Vector2(20, 11), PickUpItem.Item.HEALTH100));
 
         keyboardController = new KeyboardController(selectedMap.getPlayer(), selectedMap);
         Gdx.input.setInputProcessor(keyboardController);
