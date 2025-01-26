@@ -43,7 +43,7 @@ public class Main extends ApplicationAdapter {
 
         }
         //Wybieramy wielkosc mapy ( wpisanie wymiaru o wartosci 0 powoduje wczytanie mapy z pliku)
-        int mapWidth = 24;
+        int mapWidth = 0;
         int mapHeight = 24;
         
         cam = Player.makePlayer();
@@ -52,8 +52,8 @@ public class Main extends ApplicationAdapter {
         
         
         Gdx.graphics.setWindowedMode(840, 840);
-        dr = new DebugRenderer(20, selectedMap.arr[0].length * 20, selectedMap.arr.length * 20);
-        //dr = new DebugRenderer(20, 800, 400);
+        dr = new DebugRenderer(35, selectedMap.arr[0].length * 35, selectedMap.arr.length * 35, textures, cam);
+        //dr = new DebugRenderer(20, 800, 400, textures, cam);
         rc = new RayCaster(800, 600, textures);
         dr.setMode(Renderer.DrawMode.FULL_WINDOW);
         rc.setMode(Renderer.DrawMode.FULL_WINDOW);
@@ -62,7 +62,7 @@ public class Main extends ApplicationAdapter {
         
         //Edytor mapy - wybieramy MapEditorController, tryb gry - wybieramy keyboardController 
         //keyboardController = new KeyboardController(cam);
-        int tileWidth = Gdx.graphics.getHeight() / mapWidth;
+        int tileWidth = Gdx.graphics.getHeight() / mapHeight;
         int tileHeight = Gdx.graphics.getWidth() / mapHeight;
         MapEditorController = new MapEditorController(dr, tileWidth, tileHeight, selectedMap);
 

@@ -46,6 +46,15 @@ public class MapEditorController implements InputProcessor {
 		case Input.Keys.NUM_4:
 			selectedBlock = 4;
 			break;
+		case Input.Keys.NUM_5:
+			selectedBlock = 5;
+			break;
+		case Input.Keys.NUM_6:
+			selectedBlock = 6;
+			break;	
+		case Input.Keys.NUM_7:
+			selectedBlock = 7;
+			break;
 		case Input.Keys.S:
 			MapEditor.saveMap(map.arr, "map.json");
 			break;
@@ -60,15 +69,12 @@ public class MapEditorController implements InputProcessor {
 
         	Vector3 worldCoords = camera.unproject(new Vector3(screenX, screenY, 0));
         	
-            // Uwzględnij przesunięcie kamery w obliczeniach
             float cameraX = camera.position.x;
             float cameraY = camera.position.y;
             
-            // Obliczanie rozmiaru komórek uwzględniające zoom
             float scaledTileWidth = tileWidth * camera.zoom;
             float scaledTileHeight = tileHeight * camera.zoom;
 
-            // Uwzględnij przesunięcie kamery przy obliczaniu pozycji w siatce
             int tileX = (int) ((worldCoords.x + cameraX - (camera.viewportWidth / 2f)) / scaledTileWidth);
             int tileY = (int) ((worldCoords.y + cameraY - (camera.viewportHeight / 2f)) / scaledTileHeight);
 

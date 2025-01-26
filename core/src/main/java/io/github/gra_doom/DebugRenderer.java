@@ -1,9 +1,11 @@
 package io.github.gra_doom;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+
 import io.github.gra_doom.entity.Entity;
 
 /**
@@ -12,10 +14,16 @@ import io.github.gra_doom.entity.Entity;
 public class DebugRenderer extends Renderer {
     private int cellSize;
     private float zoom = 1.0f; // Default zoom level
+    Texture[] textures_;
+    Vector2 poz;
 
-    public DebugRenderer(int cellSize, int width, int height) {
+    
+
+    public DebugRenderer(int cellSize, int width, int height, Texture[] textures_, Player cam) {
         super(width, height);
         this.cellSize = cellSize;
+        this.textures_ = textures_;
+        this.poz = cam.pos;
     }
 
 
@@ -30,19 +38,23 @@ public class DebugRenderer extends Renderer {
     
 
     private void drawMap(Map map) {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.CYAN);
+    	batch.begin();
         for (int y = 0; y < map.arr.length; y++) {
             for (int x = 0; x < map.arr[y].length; x++) {
-                if (map.arr[y][x] != 0) { // Only render non-zero tiles
-                    float scaledCellSize = cellSize * zoom; // Adjust size based on zoom
+                if (map.arr[y][x] != 0) {
+                	TextureRegion region = new TextureRegion(textures_[map.arr[y][x]-1], 0, 0, 64, 64);
+                	if(x == poz.x && y == poz.y) {
+                		TextureRegion newRegion = new TextureRegion(textures_[3], 0, 0, 64, 64);
+                		region.setRegion(newRegion);
+                	}
+                    float scaledCellSize = cellSize * zoom;
                     float posx = (x * scaledCellSize);
                     float posy = (y * scaledCellSize);
-                    shapeRenderer.rect(posx, posy, scaledCellSize, scaledCellSize);
+                    batch.draw(region, posx, posy, scaledCellSize, scaledCellSize);
                 }
             }
         }
-        shapeRenderer.end();
+        batch.end();
     }
 
     /**
@@ -50,11 +62,11 @@ public class DebugRenderer extends Renderer {
      */
     @Override
     public void renderFrame(Map map) {
-        frameBuffer.begin();
-        clearScreen();
+        //frameBuffer.begin();
+        //clearScreen();
 
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+    	shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.BLUE);
         float scaledWidth = width * zoom;  // Adjust width for zoom
         float scaledHeight = height * zoom; // Adjust height for zoom
@@ -62,7 +74,8 @@ public class DebugRenderer extends Renderer {
         shapeRenderer.end();
 
         drawMap(map);
-        frameBuffer.end();
+        //frameBuffer.end();
+
     }
 
 

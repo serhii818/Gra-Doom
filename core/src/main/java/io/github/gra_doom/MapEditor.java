@@ -33,7 +33,7 @@ public class MapEditor {
         FileHandle file = Gdx.files.local(filePath);
         Json json = new Json();
         String mapJson = json.toJson(map);
-        file.writeString(mapJson, false);  // Zapisz w trybie nadpisania
+        file.writeString(mapJson, false);
     }
 
     
