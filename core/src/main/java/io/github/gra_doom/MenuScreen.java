@@ -66,6 +66,22 @@ public class MenuScreen implements Screen {
         ImageButton optionsButton = Buttons.create(optionsTexture);
         ImageButton exitButton = Buttons.create(exitGameTexture);
 
+        // Listener dla Play
+        startButton.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                animateButtonsOffScreen(() -> {
+                    // Przełącz na OptionsScreen po animacji
+                    Main game = ((Main) Gdx.app.getApplicationListener());
+                    game.setScreen(game.gameScreen);
+                    game.inMenu = false;
+                    Gdx.input.setInputProcessor(game.keyboardController);
+                    System.out.println("Should play game");
+                });
+                return true;
+            }
+        });
+
         // Listener dla Options
         optionsButton.addListener(new InputListener() {
             @Override

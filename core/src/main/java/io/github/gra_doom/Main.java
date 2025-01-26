@@ -3,6 +3,7 @@ package io.github.gra_doom;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,7 +13,7 @@ import io.github.gra_doom.entity.*;
 import com.badlogic.gdx.Game;
 
 
-public class Main extends ApplicationAdapter {
+public class Main extends Game {
     Map selectedMap;
 
 
@@ -24,14 +25,16 @@ public class Main extends ApplicationAdapter {
 
     Player cam;
     KeyboardController keyboardController;
+    public Screen gameScreen;
+    public Screen menuScreen;
+    boolean inMenu = true;
+
 
     /**
      * Initialization method
      */
     @Override
     public void create() {
-        this.setScreen(new MenuScreen());
-
         // preparing window renderers
         Texture[] textures = new Texture[8];
         String[] texture_path = {
@@ -111,10 +114,12 @@ public class Main extends ApplicationAdapter {
         selectedMap.addEntity(PickUpItem.makeItem(new Vector2(20, 11), PickUpItem.Item.HEALTH100));
 
         keyboardController = new KeyboardController(selectedMap.getPlayer(), selectedMap);
-        Gdx.input.setInputProcessor(keyboardController);
+        //Gdx.input.setInputProcessor(keyboardController);
 
+        gameScreen = getScreen();
 
-
+        menuScreen = new MenuScreen();
+        this.setScreen(menuScreen);
     }
 
     /**
@@ -135,21 +140,23 @@ public class Main extends ApplicationAdapter {
      */
     @Override
     public void render() {
-        super.render();
+        if (inMenu) super.render();
+        else {
 
 
-        // listen to inputs
-        // update gamestate
-        // render
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            // listen to inputs
+            // update gamestate
+            // render
+            Gdx.gl.glClearColor(0, 0, 0, 1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 
-        selectedMap.update();
+            selectedMap.update();
 
-        rc.render(selectedMap);
-        //dr.render(selectedMap);
-        dov.render(selectedMap);
+            rc.render(selectedMap);
+            //dr.render(selectedMap);
+            dov.render(selectedMap);
+        }
     }
 
 
