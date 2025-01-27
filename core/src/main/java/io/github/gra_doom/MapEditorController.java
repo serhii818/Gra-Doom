@@ -4,9 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
+import io.github.gra_doom.entity.Enemy;
 import io.github.gra_doom.entity.Entity;
+import io.github.gra_doom.entity.PickUpItem;
 
 public class MapEditorController implements InputProcessor {
 	
@@ -17,6 +20,15 @@ public class MapEditorController implements InputProcessor {
     MapEditor editor;
     int selectedBlock;
     Map map;
+    
+    public enum Type {
+        DEMON,
+        IMP,
+        ZOMBIE,
+        X
+    }
+    
+    Type EnemyType = Type.X;
 
     public MapEditorController(Renderer dr, int tileWidth, int tileHeight, Map map) {
     	this.dr = dr;
@@ -55,8 +67,29 @@ public class MapEditorController implements InputProcessor {
 		case Input.Keys.NUM_7:
 			selectedBlock = 7;
 			break;
+		case Input.Keys.NUM_8:
+			selectedBlock = 8;
+			break;
+		case Input.Keys.Q:
+			selectedBlock = 9;
+			break;
+		case Input.Keys.W:
+			selectedBlock = 10;
+			break;
+		case Input.Keys.E:
+			selectedBlock = 11;
+			break;
+		case Input.Keys.R:
+			selectedBlock = 12;
+			break;
+		case Input.Keys.T:
+			selectedBlock = 13;
+			break;
+		case Input.Keys.Y:
+			selectedBlock = 14;
+			break;		
 		case Input.Keys.S:
-			MapEditor.saveMap(map.arr, "map.json");
+			MapEditor.saveMap(map.arr, "map.json", map);
 			break;
 		}
 		return true;
@@ -77,8 +110,41 @@ public class MapEditorController implements InputProcessor {
 
             int tileX = (int) ((worldCoords.x + cameraX - (camera.viewportWidth / 2f)) / scaledTileWidth);
             int tileY = (int) ((worldCoords.y + cameraY - (camera.viewportHeight / 2f)) / scaledTileHeight);
+            
+            if(selectedBlock == 0) {
+            	for(Entity entity : map.entities) {
+            		if(entity.pos.x == tileX && entity.pos.y == tileY) {
+            			entity.selfDestroy();
+            		}
+            	}
+            }
 
-        	editor.setTile( tileY , tileX, selectedBlock);
+            if(selectedBlock < 9) {
+            	editor.setTile( tileY , tileX, selectedBlock);
+            }
+ 
+        	switch (selectedBlock) {
+        		case 9:
+        			map.addEntity(Enemy.makeEnemy(Enemy.Type.IMP, new Vector2(tileX, tileY)));
+        			break;
+        		case 10:
+        			map.addEntity(Enemy.makeEnemy(Enemy.Type.DEMON, new Vector2(tileX, tileY)));
+        			break;
+        		case 11:
+        			map.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(tileX, tileY)));
+        			break;
+        		case 12:
+        			map.addEntity(PickUpItem.makeItem(new Vector2(tileX, tileY), PickUpItem.Item.HEALTH25));
+        			break;
+        		case 13:
+        			map.addEntity(PickUpItem.makeItem(new Vector2(tileX, tileY), PickUpItem.Item.HEALTH50));
+        			break;
+        		case 14:
+        			map.addEntity(PickUpItem.makeItem(new Vector2(tileX, tileY), PickUpItem.Item.HEALTH100));
+        			break;
+        		default:
+        			break;
+        	}
         	
             return true;
         }

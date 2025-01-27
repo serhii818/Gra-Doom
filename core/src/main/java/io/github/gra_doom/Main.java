@@ -46,24 +46,24 @@ public class Main extends ApplicationAdapter {
             textures[i] = new Texture(Gdx.files.internal("pics/" + texture_path[i] + ".png"));
         }
         //Wybieramy wielkosc mapy ( wpisanie wymiaru o wartosci 0 powoduje wczytanie mapy z pliku)
-        int mapWidth = 0;
+        int mapWidth = 24;
         int mapHeight = 24;
         
         cam = Player.makePlayer();
-        int[][] arr = MapEditor.loadMap("map.json", mapWidth, mapHeight);
-        selectedMap = new Map(arr, cam);
+        selectedMap = MapEditor.loadMap("map.json", mapWidth, mapHeight, "file.ser");
+        //selectedMap = MapEditor.loadMap("map.json", mapWidth, mapHeight, "file.ser");
         
         
         Gdx.graphics.setWindowedMode(840, 840);
-        dr = new DebugRenderer(35, selectedMap.arr[0].length * 35, selectedMap.arr.length * 35, textures, cam);
-        //dr = new DebugRenderer(20, 800, 400, textures, cam);
+        dr = new DebugRenderer(35, selectedMap.arr[0].length * 35, selectedMap.arr.length * 35, textures);
+        //dr = new DebugRenderer(20, 800, 400, textures);
         rc = new RayCaster(800, 600, textures);
 
         dr.setMode(Renderer.DrawMode.FULL_WINDOW);
-        dov = new DebugOverlay(1600, 800);
-        dr.setMode(Renderer.DrawMode.CORNER_UL);
+        //dov = new DebugOverlay(1600, 800);
+        //dr.setMode(Renderer.DrawMode.CORNER_UL);
         rc.setMode(Renderer.DrawMode.FULL_WINDOW);
-        dov.setMode(Renderer.DrawMode.FULL_WINDOW);
+        //dov.setMode(Renderer.DrawMode.FULL_WINDOW);
         ((RayCaster)rc).setDrawFloorEnabled(false);
 
         
@@ -89,25 +89,8 @@ public class Main extends ApplicationAdapter {
         cam.setWeapon(pw);
 
 
-        selectedMap = new Map(arr, cam);
-
-        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.IMP, new Vector2(2, 2)));
-        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.IMP, new Vector2(20, 20)));
-
-        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(10, 10)));
-        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(11, 11)));
-        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(12, 10)));
-        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.ZOMBIE, new Vector2(10, 20)));
-
-        selectedMap.addEntity(Enemy.makeEnemy(Enemy.Type.DEMON, new Vector2(18, 21)));
-
-        selectedMap.addEntity(PickUpItem.makeItem(new Vector2(2, 3), PickUpItem.Item.HEALTH25));
-        selectedMap.addEntity(PickUpItem.makeItem(new Vector2(20, 21), PickUpItem.Item.HEALTH25));
-        selectedMap.addEntity(PickUpItem.makeItem(new Vector2(10, 21), PickUpItem.Item.HEALTH50));
-        selectedMap.addEntity(PickUpItem.makeItem(new Vector2(20, 11), PickUpItem.Item.HEALTH100));
-
-        keyboardController = new KeyboardController(selectedMap.getPlayer(), selectedMap);
-        Gdx.input.setInputProcessor(keyboardController);
+        //keyboardController = new KeyboardController(selectedMap.getPlayer(), selectedMap);
+        //Gdx.input.setInputProcessor(keyboardController);
 
 
 
@@ -123,7 +106,7 @@ public class Main extends ApplicationAdapter {
         super.resize(width, height);
         rc.viewport.update(width, height, true);
         dr.viewport.update(width, height, true);
-        dov.viewport.update(width, height, true);
+        //dov.viewport.update(width, height, true);
     }
 
     /**
@@ -141,12 +124,12 @@ public class Main extends ApplicationAdapter {
 
         selectedMap.update();
 
-        //rc.render(selectedMap);
+
         dr.render(selectedMap);
 
-        rc.render(selectedMap);
+        //rc.render(selectedMap);
         //dr.render(selectedMap);
-        dov.render(selectedMap);
+        //dov.render(selectedMap);
 
     }
 

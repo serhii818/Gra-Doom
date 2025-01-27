@@ -66,7 +66,7 @@ public class Enemy extends Character{
 
     @Override
     public void update(Map map, float frameTime) {
-        aiProcess(map);
+        //aiProcess(map);
         super.update(map, frameTime);
         if (shooting) shoot(map);
     }

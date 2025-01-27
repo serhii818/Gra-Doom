@@ -25,33 +25,34 @@ public class MapEditor {
     }
     
     
-    public static void saveMap(int[][] map, String filePath) {
+    public static void saveMap(int[][] Arr, String filePath, Map map) {
         if (filePath == null || filePath.isEmpty()) {
             filePath = "map.json";
         }
 
         FileHandle file = Gdx.files.local(filePath);
         Json json = new Json();
-        String mapJson = json.toJson(map);
+        String mapJson = json.toJson(Arr);
         file.writeString(mapJson, false);
+        Map.saveToFile(map, "file.ser");
     }
 
     
-    public static int[][] loadMap(String filePath, int mapWidth, int mapHeight) {
+    public static Map loadMap(String filePath, int mapWidth, int mapHeight, String fileName) {
+    	Map map = Map.loadFromFile(fileName);
     	if (mapWidth == 0 || mapHeight == 0) {
             Json json = new Json();
             String mapData = Gdx.files.local(filePath).readString();
-            return json.fromJson(int[][].class, mapData);
+            map.arr = json.fromJson(int[][].class, mapData);
+            return map;
     	}
     	else {
-    		int[][] map = new int[mapWidth][mapHeight];
-    		
             for (int x = 0; x < mapWidth; x++) {
                 for (int y = 0; y < mapHeight; y++) {
-                	map[0][y] = 1;
-                	map[x][0] = 1;
-                	map[mapWidth-1][y] = 1;
-                	map[x][mapHeight - 1] = 1;
+                	map.arr[0][y] = 1;
+                	map.arr[x][0] = 1;
+                	map.arr[mapWidth-1][y] = 1;
+                	map.arr[x][mapHeight - 1] = 1;
                 }
             }
             return map;
