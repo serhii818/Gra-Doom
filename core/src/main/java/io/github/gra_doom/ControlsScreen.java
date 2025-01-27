@@ -39,7 +39,7 @@ public class ControlsScreen implements Screen {
         Texture cameraTexture = new Texture("texts/camera.png");
         Texture shootTexture = new Texture("texts/shoot.png");
         Texture PauseTexture = new Texture("texts/pause.png");
-        Texture exitTexture = new Texture("texts/exit.png");
+        Texture exitTexture = new Texture(Gdx.files.internal("texts/exit.png"));
 
         // Tworzenie elementów graficznych
         Image controlSettingsImage = new Image(new TextureRegionDrawable(controlSettingsTexture));
@@ -48,7 +48,7 @@ public class ControlsScreen implements Screen {
         Image shootImage = new Image(new TextureRegionDrawable(shootTexture));
         Image debugImage = new Image(new TextureRegionDrawable(PauseTexture));
 
-        ImageButton exitButton = new ImageButton(new TextureRegionDrawable(exitTexture));
+        ImageButton exitButton = Buttons.create(exitTexture);
         exitButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

@@ -49,11 +49,9 @@ public class OptionsScreen implements Screen {
         stage.addActor(backgroundImage);
 
         // Tworzenie przycisków
-        Texture volumeTexture = new Texture(Gdx.files.internal("texts/volume-settings.png"));
         Texture controlTexture = new Texture(Gdx.files.internal("texts/control-settings.png"));
         Texture menuTexture = new Texture(Gdx.files.internal("texts/exit.png"));
 
-        ImageButton volumeButton = Buttons.create(volumeTexture);
         ImageButton controlButton = Buttons.create(controlTexture);
         ImageButton menuButton = Buttons.create(menuTexture);
 
@@ -86,8 +84,7 @@ public class OptionsScreen implements Screen {
         table.center();
         table.setFillParent(true);
 
-        table.add(volumeButton).padBottom(10).center();
-        table.row();
+
         table.add(controlButton).padBottom(10).center();
         table.row();
         table.add(menuButton).center();
