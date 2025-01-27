@@ -1,5 +1,0 @@
-Save Name: playerSave_1737966007976
-Health: 100.0
-Position: (10.074526, 21.285011)
-Score: 120
-Saved at: Mon Jan 27 09:20:08 CET 2025

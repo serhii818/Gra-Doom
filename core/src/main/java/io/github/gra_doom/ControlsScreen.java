@@ -38,7 +38,7 @@ public class ControlsScreen implements Screen {
         Texture moveTexture = new Texture("texts/move.png");
         Texture cameraTexture = new Texture("texts/camera.png");
         Texture shootTexture = new Texture("texts/shoot.png");
-        Texture debugTexture = new Texture("texts/debug.png");
+        Texture PauseTexture = new Texture("texts/pause.png");
         Texture exitTexture = new Texture("texts/exit.png");
 
         // Tworzenie elementów graficznych
@@ -46,7 +46,7 @@ public class ControlsScreen implements Screen {
         Image moveImage = new Image(new TextureRegionDrawable(moveTexture));
         Image cameraImage = new Image(new TextureRegionDrawable(cameraTexture));
         Image shootImage = new Image(new TextureRegionDrawable(shootTexture));
-        Image debugImage = new Image(new TextureRegionDrawable(debugTexture));
+        Image debugImage = new Image(new TextureRegionDrawable(PauseTexture));
 
         ImageButton exitButton = new ImageButton(new TextureRegionDrawable(exitTexture));
         exitButton.addListener(new ChangeListener() {
